@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import axios, { AxiosResponse } from 'axios';
 
-const personalAccessToken = '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';
+const personalAccessToken;
 
 interface Post {
     login: String;
