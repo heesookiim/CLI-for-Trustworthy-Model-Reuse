@@ -1,0 +1,7 @@
+npm install -g typescript
+npm install typescript ts-node  
+npm install express @types/express
+npm install axios
+npm init -y
+tsc --init
+
