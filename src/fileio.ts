@@ -1,37 +1,37 @@
 import * as fs from 'fs'
 
 // object to hold data for each module
-type module = {
-    link: string,
-    busFactor: number,
-    correctness: number,
-    rampUp: number,
-    responsiveMaintainer: number,
-    license: number,
-    netScore: number
+export type module = {
+    URL: string,
+    NET_SCORE: number,
+    RAMP_UP_SCORE: number,
+    CORRECTNESS_SCORE: number,
+    BUS_FACTOR_SCORE: number,    
+    RESPONSIVE_MAINTAINER_SCORE: number,
+    LICENSE_SCORE: number
 }
 
 // read URLs from input into array of strings
-// each string in return array will be one link
+// each string in return array will be one URL
 // input: file path as string
 // output: array of strings
 function ReadFile(file: string): string[] {
     // read file contents
-    let links: string = fs.readFileSync(file, 'utf-8');
-    let linksList: string[] = links.split('\n');
-    return linksList;
+    let URLs: string = fs.readFileSync(file, 'utf-8');
+    let URLsList: string[] = URLs.split('\n');
+    return URLsList;
 }
 
-// create an array of module objects and populate links field
-function CreateModules(linksList: string[]): module[] {
+// create an array of module objects and populate URLs field
+function CreateModules(URLsList: string[]): module[] {
     let moduleList: module[] = [];
-    // create list of module objects for each link
-    // fill link field
+    // create list of module objects for each URL
+    // fill URL field
     // initialize calculation fields to 0
-    for(let idx: number = 0; idx < linksList.length; idx++) {
-        let newModule: module = {link: linksList[idx], busFactor: 0, correctness: 0, rampUp: 0, 
-                                 responsiveMaintainer: 0, license: 0, netScore: 0};
-        console.log('\nlink: %s\n', linksList[idx]);
+    for(let idx: number = 0; idx < URLsList.length; idx++) {
+        let newModule: module = {URL: URLsList[idx], NET_SCORE: 0, RAMP_UP_SCORE: 0, CORRECTNESS_SCORE: 0,
+                                 BUS_FACTOR_SCORE: 0, RESPONSIVE_MAINTAINER_SCORE: 0, LICENSE_SCORE: 0};
+        console.log('\nURL: %s\n', URLsList[idx]);
         moduleList.push(newModule);
     }
 
@@ -51,18 +51,19 @@ function GenerateOutput(moduleList: module[]) {
 // primary function for handling input, output and calculations
 // input: string with URL_FILE location
 // output: error or NDJSON to stdout
-function URLFileHandler(file: string) {
+export function URLFileHandler(file: string) {
     // check for file existing
     if(!fs.existsSync(file)) {
+        // needs to be changed to logging
         console.log('Error: file does not exist at provided path');
         return 1;
     }
 
     // split file into array of strings
-    let linksList: string[] = ReadFile(file);
+    let URLsList: string[] = ReadFile(file);
 
     // create array of modules
-    let moduleList: module[] = CreateModules(linksList);
+    let moduleList: module[] = CreateModules(URLsList);
 
     // complete calculations
     // note: all calculated values will output 0 for now
@@ -70,5 +71,3 @@ function URLFileHandler(file: string) {
     // generate output and print to stdout
     GenerateOutput(moduleList);
 }
-
-//URLFileHandler('test.txt');

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# check if input is install
+if [ "$1" = "install" ]
+then
+    # install dependencies
+    #echo "Installing the dependencies"
+    npm install -g typescript
+    npm install typescript ts-node  
+    npm install express @types/express
+    npm install axios
+    # add check for successful install
+    echo "5 dependencies installed"
+    # need to change exit code to be based on if install was successful
+    exit 0
+
+# check if input is a file
+elif [ -f "$1" ]
+then
+    echo "Running the program"
+    tsc main.ts
+    node main.js
+    exit 0
+
+# check if input is test
+elif [ "$1" = "test" ]
+then
+    echo "Running the test suite"
+    #insert call to test suite
+    tsc main.ts
+    node main.js $2
+    exit 0
+
+# invalid input
+else
+    echo "Please enter a valid argument: ./run <URL_FILE> ./run test ./run install"
+    exit 1
+fi

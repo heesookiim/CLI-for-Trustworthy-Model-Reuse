@@ -1,18 +1,7 @@
-// included in fileio but included here to avoid errors
-// object to hold data for each module
-// remove once project is merged and this file has access to fileio.ts
-type module = {
-    link: string,
-    busFactor: number,
-    correctness: number,
-    rampUp: number,
-    responsiveMaintainer: number,
-    license: number,
-    netScore: number
-}
+import { module } from './fileio';
 
 // object to hold raw data for each module
-type data = {
+export type data = {
     contrubtorMostPullRequests: number, // Most active contributor's pull requests in past year, number
     totalPullRequests: number,          // All pull requests in the last year, number
     activeContributors: number,         // Number of active contributors in the past year, number
@@ -42,9 +31,9 @@ function BusFactor(rawData: data): number {
     return busFactor;
 }
 
-// correctness calculation
+// CORRECTNESS_SCORE calculation
 // input: raw data from REST API call
-// output: number from correctness calculation [0, 1]
+// output: number from CORRECTNESS_SCORE calculation [0, 1]
 function Correctness(rawData: data): number {
     // check inputs for divide by 0
     if(rawData.totalissues == 0 || rawData.totalIssuesMonth == 0) {
@@ -59,7 +48,7 @@ function Correctness(rawData: data): number {
 // ramp up calculation
 // input: raw data from REST API call
 // output: number from ramp up calculation [0, 1]
-function RampUp(rawData: data): number {
+function RampUP(rawData: data): number {
     return (0.5 * rawData.quickStart) + (0.25 * rawData.examples) + (0.25 * rawData.usage);
 }
 
@@ -96,12 +85,12 @@ function License(rawData: data): number {
 // output: number from net score calculation [0, 1]
 function NetScore(module: module): number {
     // calculate net score
-    return ((0.4 * module.busFactor) + (0.15 * module.correctness) + (0.15 * module.rampUp) + (0.3 * module.responsiveMaintainer))
-            - (1 * (1 - module.license))
+    return ((0.4 * module.BUS_FACTOR_SCORE) + (0.15 * module.CORRECTNESS_SCORE) + (0.15 * module.RAMP_UP_SCORE) + (0.3 * module.RESPONSIVE_MAINTAINER_SCORE))
+            - (1 * (1 - module.LICENSE_SCORE))
 }
 
 // generate calculations for each module
-// input: array of modules with links filled in
+// input: array of modules with URLs filled in
 // output: array of modules with all fields filled
 function GenerateCalculations(moduleList: module[]): module[] {
     let dataList: data[] = [];
@@ -114,17 +103,17 @@ function GenerateCalculations(moduleList: module[]): module[] {
                              totalClosedIssues: 0, totalissues: 0, totalClosedIssuesMonth: 0, totalIssuesMonth: 0,
                              quickStart: 0, examples: 0, usage: 0, closedIssues: 0, openIssues: 0, licenses: []};
 
-        // call REST API on link from module
+        // call REST API on URL from module
         // example command:
-        // let rawData: data = RestAPI(moduleList[idx].link);
+        // let rawData: data = RestAPI(moduleList[idx].URL);
 
         // calculate each metric and update module object
-        moduleList[idx].busFactor = BusFactor(rawData);
-        moduleList[idx].correctness = Correctness(rawData);
-        moduleList[idx].rampUp = RampUp(rawData);
-        moduleList[idx].responsiveMaintainer = ResponsiveMaintainer(rawData);
-        moduleList[idx].license = License(rawData);
-        moduleList[idx].netScore = NetScore(moduleList[idx]);
+        moduleList[idx].BUS_FACTOR_SCORE = BusFactor(rawData);
+        moduleList[idx].CORRECTNESS_SCORE = Correctness(rawData);
+        moduleList[idx].RAMP_UP_SCORE = RampUP(rawData);
+        moduleList[idx].RESPONSIVE_MAINTAINER_SCORE = ResponsiveMaintainer(rawData);
+        moduleList[idx].LICENSE_SCORE = License(rawData);
+        moduleList[idx].NET_SCORE = NetScore(moduleList[idx]);
     }
 
     return moduleList;
