@@ -17,9 +17,8 @@ then
 # check if input is a file
 elif [ -f "$1" ]
 then
-    echo "Running the program"
-    tsc main.ts
-    node main.js
+    tsc *.ts
+    node main.js "$1"
     exit 0
 
 # check if input is test
@@ -27,8 +26,6 @@ elif [ "$1" = "test" ]
 then
     echo "Running the test suite"
     #insert call to test suite
-    tsc main.ts
-    node main.js $2
     exit 0
 
 # invalid input
