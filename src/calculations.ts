@@ -110,7 +110,7 @@ export function GenerateCalculations(moduleList: module[]): module[] {
         // calculate each metric and update module object, round to 5 decimal places
         moduleList[idx].BUS_FACTOR_SCORE = +BusFactor(rawData).toFixed(5);
         moduleList[idx].CORRECTNESS_SCORE = +Correctness(rawData).toFixed(5);
-        moduleList[idx].RAMP_UP_SCORE = +RampUP(rawData).toFixed(5);
+        moduleList[idx].RAMP_UP_SCORE = +RampUp(rawData).toFixed(5);
         moduleList[idx].RESPONSIVE_MAINTAINER_SCORE = +ResponsiveMaintainer(rawData).toFixed(5);
         moduleList[idx].LICENSE_SCORE = +License(rawData).toFixed(5);
         moduleList[idx].NET_SCORE = +NetScore(moduleList[idx]).toFixed(5);
