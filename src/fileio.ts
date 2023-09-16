@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { GenerateCalculations } from './calculations'
 
 // object to hold data for each module
 export type module = {
@@ -18,21 +19,58 @@ export type module = {
 function ReadFile(file: string): string[] {
     // read file contents
     let URLs: string = fs.readFileSync(file, 'utf-8');
-    let URLsList: string[] = URLs.split('\n');
+    let URLsList: string[] = URLs.split('\r\n');
     return URLsList;
 }
 
-// create an array of module objects and populate URLs field
-function CreateModules(URLsList: string[]): module[] {
+// find modules with GitHub URLs
+// input: array of strings
+// output: array of modules for GitHub URLs
+function FindGitModules(URLsList: string[]): module[] {
     let moduleList: module[] = [];
-    // create list of module objects for each URL
-    // fill URL field
-    // initialize calculation fields to 0
+    // find GitHub URLs and create module objects for each
     for(let idx: number = 0; idx < URLsList.length; idx++) {
-        let newModule: module = {URL: URLsList[idx], NET_SCORE: 0, RAMP_UP_SCORE: 0, CORRECTNESS_SCORE: 0,
-                                 BUS_FACTOR_SCORE: 0, RESPONSIVE_MAINTAINER_SCORE: 0, LICENSE_SCORE: 0};
-        console.log('\nURL: %s\n', URLsList[idx]);
-        moduleList.push(newModule);
+        if(URLsList[idx].includes("github.com/")) {
+            let newModule: module = {URL: URLsList[idx], NET_SCORE: 0, RAMP_UP_SCORE: 0, CORRECTNESS_SCORE: 0,
+                                     BUS_FACTOR_SCORE: 0, RESPONSIVE_MAINTAINER_SCORE: 0, LICENSE_SCORE: 0};
+            //console.log('\nURL: %s\n', URLsList[idx]);
+            moduleList.push(newModule);
+        }
+    }
+
+    return moduleList;
+}
+
+// find modules with npm URLs
+// input: array of strings
+// output: array of modules for npm URLs
+function FindNPMModules(URLsList: string[]): module[] {
+    let moduleList: module[] = [];
+    // find npm URLs and create module objects for each
+    for(let idx: number = 0; idx < URLsList.length; idx++) {
+        if(URLsList[idx].includes("npmjs.com/")) {
+            let newModule: module = {URL: URLsList[idx], NET_SCORE: 0, RAMP_UP_SCORE: 0, CORRECTNESS_SCORE: 0,
+                                     BUS_FACTOR_SCORE: 0, RESPONSIVE_MAINTAINER_SCORE: 0, LICENSE_SCORE: 0};
+            //console.log('\nURL: %s\n', URLsList[idx]);
+            moduleList.push(newModule);
+        }
+    }
+
+    return moduleList;
+}
+
+// find other URLs
+// input: array of strings
+// output: array of modules for other URLs
+function FindOtherModules(URLsList: string[]): module[] {
+    let moduleList: module[] = [];
+    // find other URLs and create module objects for each
+    for(let idx: number = 0; idx < URLsList.length; idx++) {
+        if(!(URLsList[idx].includes("npmjs.com/")) && !(URLsList[idx].includes("github.com/"))) {
+            let newModule: module = {URL: URLsList[idx], NET_SCORE: 0, RAMP_UP_SCORE: 0, CORRECTNESS_SCORE: 0,
+                                     BUS_FACTOR_SCORE: 0, RESPONSIVE_MAINTAINER_SCORE: 0, LICENSE_SCORE: 0};
+            moduleList.push(newModule);
+        }
     }
 
     return moduleList;
@@ -44,6 +82,7 @@ function CreateModules(URLsList: string[]): module[] {
 function GenerateOutput(moduleList: module[]) {
     // output each element in moduleList
     for(let idx: number = 0; idx < moduleList.length; idx++) {
+        // output each module as NDJSON
         console.log(JSON.stringify(moduleList[idx]));
     }
 }
@@ -62,12 +101,17 @@ export function URLFileHandler(file: string) {
     // split file into array of strings
     let URLsList: string[] = ReadFile(file);
 
-    // create array of modules
-    let moduleList: module[] = CreateModules(URLsList);
+    // create array of modules for each link type
+    let gitModuleList: module[] = FindGitModules(URLsList);
+    let npmModuleList: module[] = FindNPMModules(URLsList);
+    let otherModuleList: module[] = FindOtherModules(URLsList);
 
     // complete calculations
-    // note: all calculated values will output 0 for now
+    gitModuleList = GenerateCalculations(gitModuleList);
+    npmModuleList = GenerateCalculations(npmModuleList);
 
     // generate output and print to stdout
+    // combine module lists into one for output
+    let moduleList: module[] = gitModuleList.concat(npmModuleList, otherModuleList);
     GenerateOutput(moduleList);
 }

@@ -11,7 +11,7 @@ export type data = {
     totalIssuesMonth: number,           // number of issues in the last month, number
     quickStart: number,                 // existence of quickStart in README (0 for doesn't exist, 1 for exists)
     examples: number,                   // existence of examples in README (0 for doesn't exist, 1 for exists)
-    usage: number                       // existance of usage section in README (0 for doesn't exist, 1 for exists)
+    usage: number,                       // existance of usage section in README (0 for doesn't exist, 1 for exists)
     closedIssues: number,               // number of closed issues in past 2 weeks, number
     openIssues: number,                 // number of open issues, number
     licenses: string[],                 // string of licenses for module and dependencies
@@ -31,7 +31,7 @@ function BusFactor(rawData: data): number {
     return busFactor;
 }
 
-// CORRECTNESS_SCORE calculation
+// correctness calculation
 // input: raw data from REST API call
 // output: number from CORRECTNESS_SCORE calculation [0, 1]
 function Correctness(rawData: data): number {
@@ -86,13 +86,13 @@ function License(rawData: data): number {
 function NetScore(module: module): number {
     // calculate net score
     return ((0.4 * module.BUS_FACTOR_SCORE) + (0.15 * module.CORRECTNESS_SCORE) + (0.15 * module.RAMP_UP_SCORE) + (0.3 * module.RESPONSIVE_MAINTAINER_SCORE))
-            - (1 * (1 - module.LICENSE_SCORE))
+            - (1 * (1 - module.LICENSE_SCORE));
 }
 
 // generate calculations for each module
 // input: array of modules with URLs filled in
 // output: array of modules with all fields filled
-function GenerateCalculations(moduleList: module[]): module[] {
+export function GenerateCalculations(moduleList: module[]): module[] {
     let dataList: data[] = [];
     // loop through each module and get data from REST API
     // complete claculations for each module
@@ -107,13 +107,13 @@ function GenerateCalculations(moduleList: module[]): module[] {
         // example command:
         // let rawData: data = RestAPI(moduleList[idx].URL);
 
-        // calculate each metric and update module object
-        moduleList[idx].BUS_FACTOR_SCORE = BusFactor(rawData);
-        moduleList[idx].CORRECTNESS_SCORE = Correctness(rawData);
-        moduleList[idx].RAMP_UP_SCORE = RampUP(rawData);
-        moduleList[idx].RESPONSIVE_MAINTAINER_SCORE = ResponsiveMaintainer(rawData);
-        moduleList[idx].LICENSE_SCORE = License(rawData);
-        moduleList[idx].NET_SCORE = NetScore(moduleList[idx]);
+        // calculate each metric and update module object, round to 5 decimal places
+        moduleList[idx].BUS_FACTOR_SCORE = +BusFactor(rawData).toFixed(5);
+        moduleList[idx].CORRECTNESS_SCORE = +Correctness(rawData).toFixed(5);
+        moduleList[idx].RAMP_UP_SCORE = +RampUP(rawData).toFixed(5);
+        moduleList[idx].RESPONSIVE_MAINTAINER_SCORE = +ResponsiveMaintainer(rawData).toFixed(5);
+        moduleList[idx].LICENSE_SCORE = +License(rawData).toFixed(5);
+        moduleList[idx].NET_SCORE = +NetScore(moduleList[idx]).toFixed(5);
     }
 
     return moduleList;
