@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/server.ts",
     "build": "tsc",
     "file1": "node dist/server.js",
     "file2": "node dist/fetch.js",

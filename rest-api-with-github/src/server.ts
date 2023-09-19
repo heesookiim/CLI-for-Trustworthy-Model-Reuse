@@ -1,19 +1,18 @@
 // Imports
-import { fetch_METRIC_1 } from './fetch';
+import { fetch_METRIC_data } from './fetch';
 
 // Link for any repo
 const githubApiLink = 'https://api.github.com/repos/facebook/react';
 
 (async () => {
     // Calling the main fetch function for Metric 1
-    const userData = await fetch_METRIC_1(githubApiLink);
+    const metric1 = await fetch_METRIC_data(githubApiLink);
 
     // Printing the results of fetch_METRIC_1
-    if (userData) {
-        console.log('GitHub Repo Data:');
-        console.log('ClosedIssuesInLastTwoWeeks:', userData.ClosedIssuesInLastTwoWeeks);
-        console.log('OpenIssues:', userData.OpenIssues);
+    if (metric1) {
+        console.log('ClosedIssuesInLastTwoWeeks:', metric1.ClosedIssuesInLastTwoWeeks);
+        console.log('OpenIssues:', metric1.OpenIssues);
     } else {
-        console.log('Failed to fetch GitHub user data.');
+        console.log('Failed to fetch GitHub metric1.');
     }
 })();
