@@ -114,7 +114,8 @@ export function GenerateCalculations(moduleList: module[]): module[] {
 
         // call REST API on URL from module
         // example command:
-        // let rawData: data = RestAPI(moduleList[idx].URL);
+        //let rawData: data = RestAPI(moduleList[idx].URL);
+        //let rawData = API(link: string, npmFlag: boolean)
 
         logger.log('debug', 'Raw data for calculation: ' + JSON.stringify(rawData));
       

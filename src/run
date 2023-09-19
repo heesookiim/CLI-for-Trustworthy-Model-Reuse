@@ -7,9 +7,9 @@ if [ "$1" = "install" ]
 then
     # install dependencies
     #echo "Installing the dependencies"
-    npm install -g typescript
+    #install nodejs
+    npm install typescript
     npm install typescript ts-node  
-    npm install express @types/express
     npm install axios
     npm install winston
     npm install dotenv
