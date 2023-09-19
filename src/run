@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# need to add writes to log file
+
 # check if input is install
 if [ "$1" = "install" ]
 then
@@ -9,8 +11,10 @@ then
     npm install typescript ts-node  
     npm install express @types/express
     npm install axios
+    npm install winston
+    npm install dotenv
     # add check for successful install
-    echo "5 dependencies installed"
+    echo "x dependencies installed"
     # need to change exit code to be based on if install was successful
     exit 0
 

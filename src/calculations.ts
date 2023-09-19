@@ -1,4 +1,5 @@
 import { module } from './fileio';
+import { logger } from '../logging_cfg';
 
 // object to hold raw data for each module
 export type data = {
@@ -21,6 +22,7 @@ export type data = {
 // input: raw data from REST API call
 // output: number from bus factor calculation [0, 1]
 export function BusFactor(rawData: data): number {
+    logger.log('debug', 'Calculating Bus Factor');
     // check inputs for divide by 0
     if(rawData.totalPullRequests == 0) {
         return 0;
@@ -35,6 +37,7 @@ export function BusFactor(rawData: data): number {
 // input: raw data from REST API call
 // output: number from CORRECTNESS_SCORE calculation [0, 1]
 export function Correctness(rawData: data): number {
+    logger.log('debug', 'Calculating Correctness');
     // check inputs for divide by 0
     if(rawData.totalissues == 0 || rawData.totalIssuesMonth == 0) {
         return 0;
@@ -49,6 +52,7 @@ export function Correctness(rawData: data): number {
 // input: raw data from REST API call
 // output: number from ramp up calculation [0, 1]
 export function RampUp(rawData: data): number {
+    logger.log('debug', 'Calculating Ramp Up');
     return (0.5 * rawData.quickStart) + (0.25 * rawData.examples) + (0.25 * rawData.usage);
 }
 
@@ -56,6 +60,7 @@ export function RampUp(rawData: data): number {
 // input: raw data from REST API call
 // output: number from responsive maintainer calculation [0, 1]
 export function ResponsiveMaintainer(rawData: data): number {
+    logger.log('debug', 'Responsive Maintainer');
     // check inputs for divide by 0
     if(rawData.openIssues == 0) {
         return 1;
@@ -69,6 +74,7 @@ export function ResponsiveMaintainer(rawData: data): number {
 // input: raw data from REST API call
 // output: number from license calculation [0, 1]
 export function License(rawData: data): number {
+    logger.log('debug', 'Calculating License');
     let compliant: number = 1;  // compliance of license
     // check each license
     for(let idx: number = 0; idx < (rawData.licenses).length; idx++) {
@@ -84,6 +90,7 @@ export function License(rawData: data): number {
 // input: module with data from other metric calculations
 // output: number from net score calculation [0, 1]
 export function NetScore(module: module): number {
+    logger.log('debug', 'Calculating Net Score');
     // calculate net score
     return ((0.4 * module.BUS_FACTOR_SCORE) + (0.15 * module.CORRECTNESS_SCORE) + (0.15 * module.RAMP_UP_SCORE) + (0.3 * module.RESPONSIVE_MAINTAINER_SCORE))
             - (1 * (1 - module.LICENSE_SCORE));
@@ -93,10 +100,12 @@ export function NetScore(module: module): number {
 // input: array of modules with URLs filled in
 // output: array of modules with all fields filled
 export function GenerateCalculations(moduleList: module[]): module[] {
+    logger.log('info', 'Entered calculations.ts');
     let dataList: data[] = [];
     // loop through each module and get data from REST API
     // complete claculations for each module
     for(let idx: number = 0; idx < moduleList.length; idx++) {
+        logger.log('debug', 'Calculating for module ' + moduleList[idx].URL);
         // only initialized below for testing calculations independently (can be changed for calculation testing)
         // remove once REST API call is ready
         let rawData: data = {contrubtorMostPullRequests: 0, totalPullRequests: 0, activeContributors: 0,
@@ -106,6 +115,8 @@ export function GenerateCalculations(moduleList: module[]): module[] {
         // call REST API on URL from module
         // example command:
         // let rawData: data = RestAPI(moduleList[idx].URL);
+
+        logger.log('debug', 'Raw data for calculation: ' + JSON.stringify(rawData));
       
         // calculate each metric and update module object, round to 5 decimal places
         moduleList[idx].BUS_FACTOR_SCORE = +BusFactor(rawData).toFixed(5);
@@ -114,7 +125,10 @@ export function GenerateCalculations(moduleList: module[]): module[] {
         moduleList[idx].RESPONSIVE_MAINTAINER_SCORE = +ResponsiveMaintainer(rawData).toFixed(5);
         moduleList[idx].LICENSE_SCORE = +License(rawData).toFixed(5);
         moduleList[idx].NET_SCORE = +NetScore(moduleList[idx]).toFixed(5);
+
+        logger.log('debug', 'Completed calculation for module: ' + moduleList[idx].URL);
     }
 
+    logger.log('info', 'Completed all calculations');
     return moduleList;
 }
