@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLink = exports.fetch_METRIC_1 = void 0;
+exports.convertLink = exports.getLink = exports.fetch_METRIC_1 = void 0;
 // Imports
 const axios_1 = __importDefault(require("axios"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -90,7 +90,6 @@ function getLink(npmLink) {
                 if (githubRepoMatch && githubRepoMatch[1]) {
                     // Construct the GitHub link from the matched repository URL
                     const repositoryUrl = githubRepoMatch[1].replace(/^git\+/, '').replace(/\.git$/, '');
-                    console.log(`GitHub repository URL: ${repositoryUrl}`);
                     return repositoryUrl;
                 }
             }
@@ -103,3 +102,17 @@ function getLink(npmLink) {
     });
 }
 exports.getLink = getLink;
+function convertLink(githubLink) {
+    // Split the GitHub link into 3 parts
+    const linkParts = githubLink.split('/');
+    console.log(`GitHub link parts: ${linkParts}`);
+    // The owner of the repository is the second part
+    const owner = linkParts[3];
+    // The name of the repository is the third part
+    const repoName = linkParts[4];
+    // Construct the GitHub API link from the owner and repository name
+    const githubApiLink = `https://api.github.com/repos/${owner}/${repoName}`;
+    console.log(`GitHub API link: ${githubApiLink}`);
+    return githubApiLink;
+}
+exports.convertLink = convertLink;

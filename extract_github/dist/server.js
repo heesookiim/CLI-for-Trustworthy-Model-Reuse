@@ -12,11 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Imports
 const fetch_1 = require("./fetch");
 // If there's a link for a npm package, set the flag to true and add the link
-const npmLink = 'https://www.npmjs.com/package/express';
+const npmLink = 'https://www.npmjs.com/package/browserify';
 var npmFlag = true;
 (() => __awaiter(void 0, void 0, void 0, function* () {
     if (npmFlag) {
-        (0, fetch_1.getLink)(npmLink); // Calling the getLink function to get the GitHub API link
+        const githubLink = yield Promise.resolve((0, fetch_1.getLink)(npmLink)); // Calling the getLink function to get the GitHub API link
+        const guthubApiLink = (0, fetch_1.convertLink)(githubLink);
     }
     else { // If there's no link for a npm package, add GitHub API link
         // Link for any repo

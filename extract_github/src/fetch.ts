@@ -89,7 +89,6 @@ async function getLink(npmLink: string) {
             if (githubRepoMatch && githubRepoMatch[1]) {
                 // Construct the GitHub link from the matched repository URL
                 const repositoryUrl = githubRepoMatch[1].replace(/^git\+/, '').replace(/\.git$/, '');
-                console.log(`GitHub repository URL: ${repositoryUrl}`);
                 return repositoryUrl;
             }
         }
@@ -101,4 +100,21 @@ async function getLink(npmLink: string) {
     return null;
 }
 
-export { fetch_METRIC_1, getLink };
+function convertLink(githubLink: string) {
+    // Split the GitHub link into 3 parts
+    const linkParts = githubLink.split('/');
+    console.log(`GitHub link parts: ${linkParts}`);
+    // The owner of the repository is the second part
+    const owner = linkParts[3];
+
+    // The name of the repository is the third part
+    const repoName = linkParts[4];
+
+    // Construct the GitHub API link from the owner and repository name
+    const githubApiLink = `https://api.github.com/repos/${owner}/${repoName}`;
+
+    console.log(`GitHub API link: ${githubApiLink}`);
+    return githubApiLink;
+} 
+
+export { fetch_METRIC_1, getLink, convertLink };

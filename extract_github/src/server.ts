@@ -1,14 +1,15 @@
 // Imports
-import { fetch_METRIC_1, getLink } from './fetch';
+import { fetch_METRIC_1, getLink, convertLink } from './fetch';
 
 // If there's a link for a npm package, set the flag to true and add the link
-const npmLink = 'https://www.npmjs.com/package/express';
+const npmLink = 'https://www.npmjs.com/package/browserify';
 var npmFlag = true;
 
 (async () => {
 
     if (npmFlag) { 
-        getLink(npmLink);   // Calling the getLink function to get the GitHub API link
+        const githubLink = await Promise.resolve(getLink(npmLink));   // Calling the getLink function to get the GitHub API link
+        const guthubApiLink = convertLink(githubLink);
     } 
     else {  // If there's no link for a npm package, add GitHub API link
         

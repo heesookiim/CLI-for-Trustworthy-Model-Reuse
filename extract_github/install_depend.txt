@@ -1,0 +1,4 @@
+npm install -g typescript
+npm install typescript ts-node  
+npm install axios
+npm install dotenv
