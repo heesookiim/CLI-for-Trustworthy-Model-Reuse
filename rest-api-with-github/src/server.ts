@@ -1,41 +1,18 @@
 // Imports
-import http from 'http';
-import express, { Express } from 'express';
-import morgan from 'morgan';
+import { fetch_METRIC_data } from './fetch';
 
-import routes from './routes'; // routes.ts file used here
+// Link for any repo
+const githubApiLink = 'https://api.github.com/repos/facebook/react';
 
-const API: Express = express();
+(async () => {
+    // Calling the main fetch function for Metric 1
+    const metric1 = await fetch_METRIC_data(githubApiLink);
 
-// ====================================
-API.use(morgan('dev'));
-API.use(express.urlencoded({ extended: false }));
-API.use(express.json());
-
-
-API.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'origin, X-Requested-With,Content-Type,Accept, Authorization');
-    if (req.method === 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'GET PATCH DELETE POST');
-        return res.status(200).json({});
+    // Printing the results of fetch_METRIC_1
+    if (metric1) {
+        console.log('ClosedIssuesInLastTwoWeeks:', metric1.ClosedIssuesInLastTwoWeeks);
+        console.log('OpenIssues:', metric1.OpenIssues);
+    } else {
+        console.log('Failed to fetch GitHub metric1.');
     }
-    next();
-});
-// ====================================
-
-// The API can access the points from routes.ts
-API.use('/', routes);
-
-// Error handling
-API.use((req, res, next) => {
-    const error = new Error('not found');
-    return res.status(404).json({
-        message: error.message
-    });
-});
-
-// Creates the server @ port 6060
-const httpServer = http.createServer(API);
-const PORT: any = process.env.PORT ?? 6060;
-httpServer.listen(PORT, () => console.log(`The server is running on port ${PORT}`));
+})();
