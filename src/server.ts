@@ -12,6 +12,7 @@ export async function API(link: string, npmFlag: boolean): Promise<data> {
 
     //githubApiLink = 'https://api.github.com/repos/facebook/react';
     const githubApiLink: string = convertLink(link);
+    console.log(githubApiLink);
 
     let rawData: data = {contrubtorMostPullRequests: 0, totalPullRequests: 0, activeContributors: 0,
         totalClosedIssues: 0, totalissues: 0, totalClosedIssuesMonth: 0, totalIssuesMonth: 0,
@@ -23,7 +24,8 @@ export async function API(link: string, npmFlag: boolean): Promise<data> {
 
     // Printing the results of fetch_METRIC_1
     if (userData) {
-        //rawData.closedIssues = userData.ClosedIssuesInLastTwoWeeks;
+        rawData.closedIssues = userData.ClosedIssuesInLastTwoWeeks;
+        rawData.openIssues = userData.OpenIssues;
         console.log('GitHub Repo Data:');
         console.log('ClosedIssuesInLastTwoWeeks:', userData.ClosedIssuesInLastTwoWeeks);
         console.log('OpenIssues:', userData.OpenIssues);

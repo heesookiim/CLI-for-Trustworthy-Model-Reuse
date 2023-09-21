@@ -21,7 +21,7 @@ function ReadFile(file: string): string[] {
     logger.log('debug', 'Getting links from file');
     // read file contents
     let URLs: string = fs.readFileSync(file, 'utf-8');
-    let URLsList: string[] = URLs.split('\r\n');
+    let URLsList: string[] = URLs.split('\n');
     return URLsList;
 }
 
@@ -84,15 +84,11 @@ function FindOtherModules(URLsList: string[]): module[] {
 }
 
 // generate output
-// input: array of modules
+// input: module
 // prints NDJSON output to stdout
-function GenerateOutput(moduleList: module[]) {
-    logger.log('debug', 'Generating output');
-    // output each element in moduleList
-    for(let idx: number = 0; idx < moduleList.length; idx++) {
-        // output each module as NDJSON
-        console.log(JSON.stringify(moduleList[idx]));
-    }
+export function GenerateOutput(currModule: module) {
+    logger.log('debug', 'Generating output for link: ' + currModule.URL);
+    console.log(JSON.stringify(currModule) + '\n');
 }
 
 // primary function for handling input, output and calculations
@@ -117,13 +113,23 @@ export function URLFileHandler(file: string) {
     let otherModuleList: module[] = FindOtherModules(URLsList);
 
     // complete calculations
-    logger.log('info', 'Calling metric calculation');
-    gitModuleList = GenerateCalculations(gitModuleList);
-    npmModuleList = GenerateCalculations(npmModuleList);
+    // generate output as each calculation finishes
+    logger.log('info', 'Beginning calculations');
+    // git module calculations
+    for(let idx: number = 0; idx < gitModuleList.length; idx++) {
+        logger.log('debug', 'Sending link to calculations.ts: ' + gitModuleList[idx].URL);
+        GenerateCalculations(gitModuleList[idx], false)
+    }
+
+    // npm module calculations
+    for(let idx: number = 0; idx < npmModuleList.length; idx++) {
+        logger.log('debug', 'Sending link to calculations.ts: ' + npmModuleList[idx].URL);
+        GenerateCalculations(npmModuleList[idx], true);
+    }
 
     // generate output and print to stdout
     // combine module lists into one for output
-    logger.log('info', 'Calling output generation');
-    let moduleList: module[] = gitModuleList.concat(npmModuleList, otherModuleList);
-    GenerateOutput(moduleList);
+    //logger.log('info', 'Calling output generation');
+    //let moduleList: module[] = gitModuleList.concat(npmModuleList, otherModuleList);
+    //GenerateOutput(moduleList);
 }

@@ -1,20 +1,17 @@
 #!/bin/bash
 
 # need to add writes to log file
-
 # check if input is install
 if [ "$1" = "install" ]
 then
     # install dependencies
-    #echo "Installing the dependencies"
-    #install nodejs
-    npm install typescript
-    npm install typescript ts-node  
-    npm install axios
-    npm install winston
-    npm install dotenv
+    npm install typescript &> './dev/null'
+    npm install typescript ts-node &> './dev/null'
+    npm install axios &> './dev/null'
+    npm install winston &> './dev/null'
+    npm install dotenv &> './dev/null'
     # add check for successful install
-    echo "x dependencies installed"
+    echo "4 dependencies installed"
     # need to change exit code to be based on if install was successful
     exit 0
 

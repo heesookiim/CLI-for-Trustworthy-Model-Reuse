@@ -1,6 +1,6 @@
 // Imports
 import axios from 'axios';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 const personalAccessToken = process.env.GITHUB_TOKEN; // personalAccessToken stored locally

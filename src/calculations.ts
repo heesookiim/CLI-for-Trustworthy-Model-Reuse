@@ -1,5 +1,6 @@
-import { module } from './fileio';
+import { module, GenerateOutput } from './fileio';
 import { logger } from '../logging_cfg';
+import { API } from './server';
 
 // object to hold raw data for each module
 export type data = {
@@ -96,40 +97,29 @@ export function NetScore(module: module): number {
             - (1 * (1 - module.LICENSE_SCORE));
 }
 
-// generate calculations for each module
-// input: array of modules with URLs filled in
-// output: array of modules with all fields filled
-export function GenerateCalculations(moduleList: module[]): module[] {
-    logger.log('info', 'Entered calculations.ts');
-    let dataList: data[] = [];
-    // loop through each module and get data from REST API
-    // complete claculations for each module
-    for(let idx: number = 0; idx < moduleList.length; idx++) {
-        logger.log('debug', 'Calculating for module ' + moduleList[idx].URL);
-        // only initialized below for testing calculations independently (can be changed for calculation testing)
-        // remove once REST API call is ready
-        let rawData: data = {contrubtorMostPullRequests: 0, totalPullRequests: 0, activeContributors: 0,
-                             totalClosedIssues: 0, totalissues: 0, totalClosedIssuesMonth: 0, totalIssuesMonth: 0,
-                             quickStart: 0, examples: 0, usage: 0, closedIssues: 0, openIssues: 0, licenses: []};
-
-        // call REST API on URL from module
-        // example command:
-        //let rawData: data = RestAPI(moduleList[idx].URL);
-        //let rawData = API(link: string, npmFlag: boolean)
-
-        logger.log('debug', 'Raw data for calculation: ' + JSON.stringify(rawData));
-      
+// new development - handle one function at once in async function
+// input: module with URL filled in
+// output: module with all fields filled in
+export async function GenerateCalculations(currModule: module, npmFlag: boolean) {
+    console.log('info', 'Working on link: ' + currModule.URL);
+    // call API for given module
+    const response = Promise.resolve(API(currModule.URL, npmFlag));
+    response.then((data) => {
+        let rawData = data;
+        logger.log('debug', 'Raw data for calculation from API: ' + JSON.stringify(rawData));
         // calculate each metric and update module object, round to 5 decimal places
-        moduleList[idx].BUS_FACTOR_SCORE = +BusFactor(rawData).toFixed(5);
-        moduleList[idx].CORRECTNESS_SCORE = +Correctness(rawData).toFixed(5);
-        moduleList[idx].RAMP_UP_SCORE = +RampUp(rawData).toFixed(5);
-        moduleList[idx].RESPONSIVE_MAINTAINER_SCORE = +ResponsiveMaintainer(rawData).toFixed(5);
-        moduleList[idx].LICENSE_SCORE = +License(rawData).toFixed(5);
-        moduleList[idx].NET_SCORE = +NetScore(moduleList[idx]).toFixed(5);
+        currModule.BUS_FACTOR_SCORE = +BusFactor(rawData).toFixed(5);
+        currModule.CORRECTNESS_SCORE = +Correctness(rawData).toFixed(5);
+        currModule.RAMP_UP_SCORE = +RampUp(rawData).toFixed(5);
+        currModule.RESPONSIVE_MAINTAINER_SCORE = +ResponsiveMaintainer(rawData).toFixed(5);
+        currModule.LICENSE_SCORE = +License(rawData).toFixed(5);
+        currModule.NET_SCORE = +NetScore(currModule).toFixed(5);
 
-        logger.log('debug', 'Completed calculation for module: ' + moduleList[idx].URL);
-    }
-
-    logger.log('info', 'Completed all calculations');
-    return moduleList;
+        logger.log('info', 'Completed calculation for module: ' + currModule.URL);
+        GenerateOutput(currModule);
+    });
+    response.catch((err) => {
+        console.log('info', 'Error in API call: ' + err);
+        GenerateOutput(currModule);
+    });
 }
