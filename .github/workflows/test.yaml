@@ -1,3 +1,4 @@
+# adapted from Chombler/CI-Demo
 # run tests on pull request
 name: test
 on:
