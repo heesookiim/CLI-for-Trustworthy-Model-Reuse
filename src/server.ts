@@ -13,7 +13,7 @@ export async function API(link: string, npmFlag: boolean): Promise<data> {
 
     //githubApiLink = 'https://api.github.com/repos/facebook/react';
     const githubApiLink: string = convertLink(link);
-    console.log(githubApiLink);
+    //console.log(githubApiLink);
 
     let rawData: data = {contrubtorMostPullRequests: 0, totalPullRequests: 0, activeContributors: 0,
         totalClosedIssues: 0, totalissues: 0, totalClosedIssuesMonth: 0, totalIssuesMonth: 0,
