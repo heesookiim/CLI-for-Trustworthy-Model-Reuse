@@ -20,7 +20,7 @@ interface MetricData {
     issuesOpen: number; // number of open issues [responsive maintainer]
 }
 
-// vars
+// variables
 let totalPullers365 = 0; // number of active contributors, last 365 days [bus factor]
 let mostPulls365 = 0; // most active contributor's pull request count, last 365 days [bus factor]
 let totalPulls365 = 0; // number of pull requests, last 365 days [bus factor]
@@ -39,49 +39,62 @@ date14.setDate(date14.getDate() - 14); // (Today - 14 Days) ~ 2 weeks
 date30.setDate(date30.getDate() - 30); // (Today - 30 Days) ~ 1 month
 date365.setDate(date365.getDate() - 365); // (Today - 365 Days) ~ 1 year
 
+// Fetches all the metrics from the GitHub API
+// Takes in an GitHub API link (not GitHub link or npm link)
+// Returns an interface of type MetricData,
 async function fetch_METRICS(apiLink: string): Promise<MetricData> {
+
+    console.log(`Entering fetch_METRICS function`);
 
     // Function to fetch issues
     async function fetchIssues() {
 
-        // GitHub's REST API considers every pull request an issue, but not every issue is a pull request.
-        // For this reason, "Issues" endpoints may return both issues and pull requests in the response.
-        let issuesAppearingAsPullRequests = 0;
-        let pageNumberIssue = 1;
+        console.log(`Entering fetchIssues function`);
 
+        let pageNumberIssue = 1; // page number of which the issues are being shown
+
+        // starts a while loop which only breaks when all the issues have been interated through
+        // since it goes through 100 issues per iteration, the break condition is if the # of issues in the page < 100
         while (true) {
 
+            // fetches the data of 100 pages of page ${pageNumberIssue}
             const responseIssue = await axios.get(`${apiLink}/issues?state=all&page=${pageNumberIssue}&per_page=100`, {
                 headers: {
                     Authorization: `token ${personalAccessToken}`,
                 },
             });
 
+            // the next 6 arrays are created to store specific data from the response
+            // GitHub's REST API considers every pull request an issue, but not every issue is a pull request.
+            // For this reason, "Issues" endpoints may return both issues and pull requests in the response.
+
             const issuesClosed_Array = responseIssue.data // number of closed issues [correctness]
-            .filter((issue: any) => !(issue.pull_request))
-            .filter((issue: any) => issue.state == 'closed');
+            .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
+            .filter((issue: any) => issue.state == 'closed'); // filtering for only closed issues
 
             const issuesTotal_Array = responseIssue.data // total number of issues [correctness]
-            .filter((issue: any) => !(issue.pull_request));
+            .filter((issue: any) => !(issue.pull_request)); // making sure the issue is actually an issue, not a pull request
 
             const issuesClosed30_Array = responseIssue.data // number of closed issues, last 30 days [correctness]
-            .filter((issue: any) => !(issue.pull_request))
-            .filter((issue: any) => issue.state == 'closed')
-            .filter((issue: any) => new Date(issue.created_at) >= date30);
+            .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
+            .filter((issue: any) => issue.state == 'closed') // filtering for only closed issues
+            .filter((issue: any) => new Date(issue.created_at) >= date30); // filtering for only issues in the last month
 
             const issuesTotal30_Array = responseIssue.data // total number of issues, last 30 days [correctness]
-            .filter((issue: any) => !(issue.pull_request))
-            .filter((issue: any) => new Date(issue.created_at) >= date30);
+            .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
+            .filter((issue: any) => new Date(issue.created_at) >= date30); // filtering for only issues in the last month
 
             const issuesClosed14_Array = responseIssue.data // number of closed issues, last 14 days [responsive maintainer]
-            .filter((issue: any) => !(issue.pull_request))
-            .filter((issue: any) => issue.state == 'closed')
-            .filter((issue: any) => new Date(issue.created_at) >= date14);
+            .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
+            .filter((issue: any) => issue.state == 'closed') // filtering for only closed issues
+            .filter((issue: any) => new Date(issue.created_at) >= date14); // filtering for only issues in the last 2 weeks
 
             const issuesOpen_Array = responseIssue.data // number of open issues [responsive maintainer]
-            .filter((issue: any) => !(issue.pull_request))
-            .filter((issue: any) => issue.state == 'open');
+            .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
+            .filter((issue: any) => issue.state == 'open'); // filtering for only open issues
 
+
+            // adding the counts of each array to it's respective counter
             issuesClosed += issuesClosed_Array.length;
             issuesTotal += issuesTotal_Array.length;
             issuesClosed30 += issuesClosed30_Array.length;
@@ -89,14 +102,18 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
             issuesClosed14 += issuesClosed14_Array.length;
             issuesOpen += issuesOpen_Array.length;
 
+            // Higher Logging Level
             // console.log(`Completed Issues: ${issuesTotal}`)
 
+            // break condition to exit the while loop
+            // exits in the first iteration if the issues in the first page are less than ${per_page}
             if (responseIssue.data.length < 100) {
                 break;
             }
+            // goes to the next page
             pageNumberIssue++;
         }
-
+        console.log(`Fetches all issues!`);
         console.log(`issuesClosed : ${issuesClosed}`);
         console.log(`issuesTotal : ${issuesTotal}`);
         console.log(`issuesClosed30 : ${issuesClosed30}`);
@@ -106,39 +123,53 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
 
     }
 
+    // Function to fetch pulls
     async function fetchPulls() {
 
-        let pageNumberPull = 1;
-        let contributors: string[] = [];
-        let highestOccurrence = 0;
-        let highestOccurrenceUsername = '';
+        console.log(`Entering fetchPulls function`);
 
+        let pageNumberPull = 1; // page number of which the pulls are being shown
+        let contributors: string[] = []; // contains usernames of different usernames from all pull requests, in the last year
+        let highestOccurrence = 0; // contains the highest number of pull requests done by a username
+        let highestOccurrenceUsername = ''; // contains the username which did the highest number of pull requests
+
+        // starts a while loop which only breaks when all the pull requests have been interated through
+        // since it goes through 100 pull requests per iteration, the break condition is if the # of issues in the page < 100
         while (true) {
 
+            // fetches the data of 100 pages of page ${pageNumberPull}
             const responsePull = await axios.get(`${apiLink}/pulls?page=${pageNumberPull}&per_page=100`, {
                 headers: {
                     Authorization: `token ${personalAccessToken}`,
                 },
             });
 
+            // stores specific data from the response, containes the usernames of the pull request makers
             const usernamesThisFetch = responsePull.data
-            .filter((pull_request: any) => new Date(pull_request.created_at) >= date365)
-            .map((pull_request: any) => pull_request.user.login);
+            .filter((pull_request: any) => new Date(pull_request.created_at) >= date365) // filtering for only issues in the last year
+            .map((pull_request: any) => pull_request.user.login); // mapped by username
 
+            // adds to the total number of pull requests
             totalPulls365 += usernamesThisFetch.length
-
+            
+            // puts the usernames into a different array so they are unique
             usernamesThisFetch.forEach((username: string) => {
                 contributors.push(username);
             });
 
+            // Higher Logging Level
             // console.log(`Completed Pull Requests (From Last Year): ${totalPulls365}`)
 
+            // break condition to exit the while loop
+            // exits in the first iteration if the pull requests in the first page are less than ${per_page}
             if (responsePull.data.length < 100) {
                 break;
             }
+            // goes to the next page
             pageNumberPull++;
         }
 
+        // attaches a number to each username which contains the number of times they had pull requests
         const usernameCounts: { [username: string]: number } = {};
         contributors.forEach((username) => {
             if (usernameCounts[username]) {
@@ -148,6 +179,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
             }
         });
 
+        // finds the username with the highest number of pull requests
         const uniqueUsernames = Object.keys(usernameCounts);
         uniqueUsernames.forEach((username) => {
             if (usernameCounts[username] > highestOccurrence) {
@@ -155,7 +187,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
                 highestOccurrenceUsername = username;
             }
         });
-
+        
         totalPullers365 = uniqueUsernames.length;
         mostPulls365 = highestOccurrence;
 
@@ -165,9 +197,11 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
 
     }
 
+    // calls the 2 functions
     fetchIssues();
     fetchPulls();
 
+    // creates an object of the interface and exports it after assigning the correct data
     let exportMetric: MetricData = {
         totalPullers365: totalPullers365, // number of active contributors, last 365 days [bus factor]
         mostPulls365: mostPulls365, // most active contributor's pull request count, last 365 days [bus factor]
@@ -179,7 +213,8 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
         issuesClosed14: issuesClosed14, // number of closed issues, last 14 days [responsive maintainer]
         issuesOpen: issuesOpen, // number of open issues [responsive maintainer]
     };
-
+    
+    // export
     return exportMetric;
 
 }
