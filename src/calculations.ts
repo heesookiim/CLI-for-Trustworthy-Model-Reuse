@@ -1,5 +1,6 @@
-import { module } from './fileio';
-import { logger } from '../logging_cfg';
+import { module, GenerateOutput } from './fileio';
+import { logger } from './logging_cfg';
+import { API } from './server';
 
 // object to hold raw data for each module
 export type data = {
@@ -22,9 +23,10 @@ export type data = {
 // input: raw data from REST API call
 // output: number from bus factor calculation [0, 1]
 export function BusFactor(rawData: data): number {
-    logger.log('debug', 'Calculating Bus Factor');
+    logger.log('info', 'Calculating Bus Factor');
     // check inputs for divide by 0
     if(rawData.totalPullRequests == 0) {
+        logger.log('debug', 'total pull requests 0')
         return 0;
     }
 
@@ -37,9 +39,10 @@ export function BusFactor(rawData: data): number {
 // input: raw data from REST API call
 // output: number from CORRECTNESS_SCORE calculation [0, 1]
 export function Correctness(rawData: data): number {
-    logger.log('debug', 'Calculating Correctness');
+    logger.log('info', 'Calculating Correctness');
     // check inputs for divide by 0
     if(rawData.totalissues == 0 || rawData.totalIssuesMonth == 0) {
+        logger.log('debug', 'Total issues or total issues this month 0');
         return 0;
     }
 
@@ -52,7 +55,7 @@ export function Correctness(rawData: data): number {
 // input: raw data from REST API call
 // output: number from ramp up calculation [0, 1]
 export function RampUp(rawData: data): number {
-    logger.log('debug', 'Calculating Ramp Up');
+    logger.log('info', 'Calculating Ramp Up');
     return (0.5 * rawData.quickStart) + (0.25 * rawData.examples) + (0.25 * rawData.usage);
 }
 
@@ -74,7 +77,7 @@ export function ResponsiveMaintainer(rawData: data): number {
 // input: raw data from REST API call
 // output: number from license calculation [0, 1]
 export function License(rawData: data): number {
-    logger.log('debug', 'Calculating License');
+    logger.log('info', 'Calculating License');
     let compliant: number = 1;  // compliance of license
     // check each license
     for(let idx: number = 0; idx < (rawData.licenses).length; idx++) {
@@ -90,46 +93,41 @@ export function License(rawData: data): number {
 // input: module with data from other metric calculations
 // output: number from net score calculation [0, 1]
 export function NetScore(module: module): number {
-    logger.log('debug', 'Calculating Net Score');
+    logger.log('info', 'Calculating Net Score');
     // calculate net score
     return ((0.4 * module.BUS_FACTOR_SCORE) + (0.15 * module.CORRECTNESS_SCORE) + (0.15 * module.RAMP_UP_SCORE) + (0.3 * module.RESPONSIVE_MAINTAINER_SCORE))
             - (1 * (1 - module.LICENSE_SCORE));
 }
 
-// generate calculations for each module
-// input: array of modules with URLs filled in
-// output: array of modules with all fields filled
-export function GenerateCalculations(moduleList: module[]): module[] {
-    logger.log('info', 'Entered calculations.ts');
-    let dataList: data[] = [];
-    // loop through each module and get data from REST API
-    // complete claculations for each module
-    for(let idx: number = 0; idx < moduleList.length; idx++) {
-        logger.log('debug', 'Calculating for module ' + moduleList[idx].URL);
-        // only initialized below for testing calculations independently (can be changed for calculation testing)
-        // remove once REST API call is ready
-        let rawData: data = {contrubtorMostPullRequests: 0, totalPullRequests: 0, activeContributors: 0,
-                             totalClosedIssues: 0, totalissues: 0, totalClosedIssuesMonth: 0, totalIssuesMonth: 0,
-                             quickStart: 0, examples: 0, usage: 0, closedIssues: 0, openIssues: 0, licenses: []};
-
-        // call REST API on URL from module
-        // example command:
-        //let rawData: data = RestAPI(moduleList[idx].URL);
-        //let rawData = API(link: string, npmFlag: boolean)
-
-        logger.log('debug', 'Raw data for calculation: ' + JSON.stringify(rawData));
-      
+// new development - handle one function at once in async function
+// input: module with URL filled in
+// output: module with all fields filled in
+export async function GenerateCalculations(currModule: module, npmFlag: boolean) {
+    logger.log('info', 'Working on link: ' + currModule.URL);
+    // call API for given module
+    const response = Promise.resolve(API(currModule.URL, npmFlag));
+    response.then((data) => {
+        let rawData = data;
+        logger.log('debug', 'Raw data for calculation from API: ' + JSON.stringify(rawData));
         // calculate each metric and update module object, round to 5 decimal places
-        moduleList[idx].BUS_FACTOR_SCORE = +BusFactor(rawData).toFixed(5);
-        moduleList[idx].CORRECTNESS_SCORE = +Correctness(rawData).toFixed(5);
-        moduleList[idx].RAMP_UP_SCORE = +RampUp(rawData).toFixed(5);
-        moduleList[idx].RESPONSIVE_MAINTAINER_SCORE = +ResponsiveMaintainer(rawData).toFixed(5);
-        moduleList[idx].LICENSE_SCORE = +License(rawData).toFixed(5);
-        moduleList[idx].NET_SCORE = +NetScore(moduleList[idx]).toFixed(5);
+        currModule.BUS_FACTOR_SCORE = +BusFactor(rawData).toFixed(5);
+        logger.log('debug', 'Calculated BUS_FACTOR_SCORE: ' + currModule.BUS_FACTOR_SCORE);
+        currModule.CORRECTNESS_SCORE = +Correctness(rawData).toFixed(5);
+        logger.log('debug', 'Calculated CORRECTNESS SCORE: ' + currModule.CORRECTNESS_SCORE);
+        currModule.RAMP_UP_SCORE = +RampUp(rawData).toFixed(5);
+        logger.log('debug', 'Calculated RAMP UP SCORE: ' + currModule.RAMP_UP_SCORE);
+        currModule.RESPONSIVE_MAINTAINER_SCORE = +ResponsiveMaintainer(rawData).toFixed(5);
+        logger.log('debug', 'Calculated RESPONSIVE MAINTAINER SCORE: ' + currModule.RESPONSIVE_MAINTAINER_SCORE);
+        currModule.LICENSE_SCORE = +License(rawData).toFixed(5);
+        logger.log('debug', 'Calculated LICENSE SCORE: ' + currModule.LICENSE_SCORE);
+        currModule.NET_SCORE = +NetScore(currModule).toFixed(5);
+        logger.log('debug', 'Calculated NET_SCORE: ' + currModule.NET_SCORE);
 
-        logger.log('debug', 'Completed calculation for module: ' + moduleList[idx].URL);
-    }
-
-    logger.log('info', 'Completed all calculations');
-    return moduleList;
+        logger.log('info', 'Completed calculation for module: ' + currModule.URL);
+        GenerateOutput(currModule);
+    });
+    response.catch((err) => {
+        logger.log('info', 'Error in API call: ' + err);
+        GenerateOutput(currModule);
+    });
 }

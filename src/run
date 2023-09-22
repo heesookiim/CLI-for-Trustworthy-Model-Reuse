@@ -1,34 +1,81 @@
 #!/bin/bash
 
 # need to add writes to log file
-
 # check if input is install
-if [ "$1" = "install" ]
-then
+if [ "$1" = "install" ]; then
     # install dependencies
-    #echo "Installing the dependencies"
-    #install nodejs
-    npm install typescript
-    npm install typescript ts-node  
-    npm install axios
-    npm install winston
-    npm install dotenv
-    # add check for successful install
-    echo "x dependencies installed"
-    # need to change exit code to be based on if install was successful
-    exit 0
+    TSERR=$(npm install typescript 2>&1 > '/dev/null')
+    TSNODEERR=$(npm install typescript ts-node 2>&1 > '/dev/null')
+    AXIOSERR=$(npm install axios 2>&1 > '/dev/null')
+    WINSTONERR=$(npm install winston 2>&1 > '/dev/null')
+    DOTENVERR=$(npm install dotenv 2>&1 > '/dev/null')
+    NDJSONERR=$(npm install --save @types/ndjson 2>&1 > '/dev/null')
+    JESTERR=$(npm install jest 2>&1 > '/dev/null')
+    # check for successful installs
+    if [[ $TSERROR != '' ]]; then
+        echo 'Error installing typescript'
+        exit 1
+    elif [[ $TSNODEERR != '' ]]; then
+        echo 'Error installing typescript ts-node'
+        exit 1
+    elif [[ $AXIOSERR != '' ]]; then
+        echo 'Error installing axios'
+        exit 1
+    elif [[ $WINSTONERR != '' ]]; then
+        echo 'Error installing winston'
+        exit 1
+    elif [[ $DOTENVERR != '' ]]; then
+        echo 'Error installing dotenv'
+        exit 1
+    elif [[ $NDJSONERR != '' ]]; then
+        echo 'Error installing ndjson type'
+        exit 1
+    elif [[ $JESTERR != '' ]]; then
+        echo 'Error installing jest'
+        exit 1
+    else
+        echo "6 dependencies successfully installed"
+        exit 0
+    fi
 
 # check if input is a file
 elif [ -f "$1" ]
 then
-    tsc *.ts
-    node main.js "$1"
-    exit 0
+    TSC=$(tsc main.ts fetch.ts fileio.ts calculations.ts logging_cfg.ts 2>&1 > '/dev/null');
+    if [[ $TSC != '' ]]; then
+        echo "Files failed to compile"
+        exit 1
+    else
+        if [[ "${LOG_FILE}" == '' ]]; then
+            echo "LOG_FILE not set"
+            exit 1
+        elif [[ "${GITHUB_TOKEN}" == '' ]]; then
+            echo "GITHUB_TOKEN not set"
+            exit 1
+        else
+            node main.js $1
+            exit 0
+        fi
+    fi
 
 # check if input is test
 elif [ "$1" = "test" ]
 then
-    echo "Running the test suite"
+
+    #TEST=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 > '/dev/null')
+    #TEST=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 | tee /dev/tty)
+    #echo $TEST
+    #echo $COVERAGE_REPORT
+    #coverage_report=$(npx jest calculations.test.ts --coverage)
+    #line_coverage=$(echo "$coverage_report" | grep -oP 'Lines:\s+\K[0-9.]+%' | sed 's/%//')
+
+    #echo "Line coverage: $line_coverage"
+    #COVERAGE_RAW=$(npx jest calculations.test.ts --coverage --coverageReporters="text-summary" )
+    #echo "$COVERAGE_RAW" | awk -F'/| ' '/Branches/{print $(NF-1)}'
+
+    # COVERAGE=$(npx jest calculations.test.ts --coverage --silent)
+    #echo $COVERAGE
+    #echo "Running the test suite"
     #insert call to test suite
     exit 0
 

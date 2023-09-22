@@ -1,5 +1,8 @@
 
 .DS_Store
-rest-api-with-github/node_modules
+node_modules
 *.js
 .env
+*.txt
+*.py
+node_modules

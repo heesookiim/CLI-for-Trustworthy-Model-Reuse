@@ -21,7 +21,6 @@ export const logger = createLogger({
     level: logLevel,
     silent: logSilent,
     transports: [ new transports.File({filename: process.env.LOG_FILE}) ],
-    //transports: [new transports.Console()],
     format: format.combine(
         format.timestamp(),
         format.printf(({ level, message, timestamp}) => {
