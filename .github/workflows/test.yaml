@@ -1,6 +1,8 @@
 # run tests on pull request
 name: test
-  on: pull_request
+on:
+  pull_request:
+    branches: [ main ]
 
 jobs:
   test:
