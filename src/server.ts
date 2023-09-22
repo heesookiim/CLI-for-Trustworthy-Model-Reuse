@@ -1,6 +1,7 @@
 // Imports
 import { data } from './calculations';
 import { fetch_METRICS, getLink, convertLink } from './fetch';
+import { ReadMeExtractor } from './github-readme-extractor'
 import { logger } from './logging_cfg'
 
 // If there's a link for a npm package, set the flag to true and add the link
@@ -21,6 +22,12 @@ export async function API(link: string, npmFlag: boolean): Promise<data> {
     
     // Link for any repo
     const userData = await fetch_METRICS(githubApiLink);
+
+    // get readme data
+    const response = await ReadMeExtractor(link);
+    rawData.quickStart = response[0];
+    rawData.examples = response[1];
+    rawData.usage = response[2];
 
     // Printing the results of fetch_METRIC_1
     if (userData) {

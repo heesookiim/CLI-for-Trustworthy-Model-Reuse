@@ -1,11 +1,12 @@
 import * as fs from 'fs';
 import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/node';
+import { logger } from './logging_cfg';
 
-const githubRepoUrl = 'https://github.com/lodash/lodash'; // Replace with the actual GitHub repository URL
-const localRepoPath = './local-repo'; // Specify the path where you want to clone the repository
+//const githubRepoUrl = 'https://github.com/lodash/lodash'; // Replace with the actual GitHub repository URL
 
-async function main() {
+export async function ReadMeExtractor(githubRepoUrl: string): Promise<number[]> {
+  const localRepoPath = './local-repo'; // Specify the path where you want to clone the repository
   try {
     // Check if the local directory exists already
     const localRepoExists = fs.existsSync(localRepoPath);
@@ -15,14 +16,14 @@ async function main() {
       fs.rm(localRepoPath, { recursive: true }, (err) => {
         if(err){
             // File deletion failed
-            console.error(err.message);
+            logger.log('info', err.message);
             return;
         }
-        console.log("File deleted successfully");
+        //console.log("File deleted successfully");
       })};
 
     // Clone the repository
-    console.log('Cloning repository...\n');
+    //console.log('Cloning repository...\n');
     await git.clone({
       fs,
       http,
@@ -40,26 +41,34 @@ async function main() {
     // console.log(readmeContent);
 
     // Extract information
-    const quickStartFound = checkQuickStart(readmeContent);
-    const examplesFound = checkExamples(readmeContent);
-    const usageFound = checkUsage(readmeContent);
+    const quickStartFound: number = checkQuickStart(readmeContent);
+    const examplesFound: number = checkExamples(readmeContent);
+    const usageFound: number = checkUsage(readmeContent);
 
-    console.log('Quick Start:', quickStartFound);
-    console.log('Examples:', examplesFound);
-    console.log('Usage:', usageFound);
+    logger.log('info', 'Readme data gathered for ' + githubRepoUrl);
+    logger.log('debug', 'Quick Start: ' + quickStartFound);
+    logger.log('debug', 'Examples: ' + examplesFound);
+    logger.log('debug', 'Usage' + usageFound);
+    deletePath(localRepoPath);
+    return [quickStartFound, examplesFound, usageFound];
+
   } catch (error) {
-    console.error('An error occurred:', error);
+    logger.log('info', 'An error occurred:' + error);
+    deletePath(localRepoPath);
+    return [0, 0, 0];
   }
+}
 
+function deletePath(localRepoPath: string) {
   // Delete the local repository
-  console.log(`\nDeleting ${localRepoPath}...`);
+  logger.log('debug', `\nDeleting ${localRepoPath}...`);
   fs.rm(localRepoPath, { recursive: true }, (err) => {
     if(err){
         // File deletion failed
-        console.error(err.message);
+        logger.log('info', err.message);
         return;
     }
-    console.log("File deleted successfully\n");
+    logger.log('info', "File deleted successfully\n");
   });
 }
 
@@ -110,5 +119,3 @@ function checkUsage(content: string): number {
     
     return 0;
 }
-
-main();

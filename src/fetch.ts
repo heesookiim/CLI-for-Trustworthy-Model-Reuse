@@ -45,12 +45,12 @@ date365.setDate(date365.getDate() - 365); // (Today - 365 Days) ~ 1 year
 // Returns an interface of type MetricData,
 async function fetch_METRICS(apiLink: string): Promise<MetricData> {
 
-    console.log(`Entering fetch_METRICS function`);
+    //console.log(`Entering fetch_METRICS function`);
 
     // Function to fetch issues
     async function fetchIssues() {
 
-        console.log(`Entering fetchIssues function`);
+        //console.log(`Entering fetchIssues function`);
 
         let pageNumberIssue = 1; // page number of which the issues are being shown
 
@@ -116,26 +116,26 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
                 // goes to the next page
                 pageNumberIssue++;
             } else {
-                console.log("No Issue Server Response in fetch.ts") // to be removed later
-                logger.log(`info`, `NO SERVER RESPONSE`);
+                //console.log("No Issue Server Response in fetch.ts") // to be removed later
+                //logger.log(`info`, `NO SERVER RESPONSE`);
                 break;
             }
 
         }
-        console.log(`Fetches all issues!`);
+        /*console.log(`Fetches all issues!`);
         console.log(`issuesClosed : ${issuesClosed}`);
         console.log(`issuesTotal : ${issuesTotal}`);
         console.log(`issuesClosed30 : ${issuesClosed30}`);
         console.log(`issuesTotal30 : ${issuesTotal30}`);
         console.log(`issuesClosed14 : ${issuesClosed14}`);
         console.log(`issuesOpen : ${issuesOpen}`);
-
+        */
     }
 
     // Function to fetch pulls
     async function fetchPulls() {
 
-        console.log(`Entering fetchPulls function`);
+        //console.log(`Entering fetchPulls function`);
 
         let pageNumberPull = 1; // page number of which the pulls are being shown
         let contributors: string[] = []; // contains usernames of different usernames from all pull requests, in the last year
@@ -178,7 +178,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
                 // goes to the next page
                 pageNumberPull++;
             } else {
-                console.log("No Pull Request Server Response in fetch.ts") // to be removed later
+                //console.log("No Pull Request Server Response in fetch.ts") // to be removed later
                 logger.log(`info`, `NO SERVER RESPONSE`);
                 break;
             }
@@ -206,10 +206,10 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
         totalPullers365 = uniqueUsernames.length;
         mostPulls365 = highestOccurrence;
 
-        console.log(`totalPullers365 : ${totalPullers365}`);
+        /*console.log(`totalPullers365 : ${totalPullers365}`);
         console.log(`mostPulls365 : ${mostPulls365}`);
         console.log(`totalPulls365 : ${totalPulls365}`);
-
+        */
     }
 
     // calls the 2 functions
@@ -252,7 +252,7 @@ async function getLink(npmLink: string) {
             }
         }
     } catch (error: any) {
-        console.error(`Error: ${error.message}`);
+        //console.error(`Error: ${error.message}`);
     }
 
     // Return null if the GitHub link couldn't be retrieved

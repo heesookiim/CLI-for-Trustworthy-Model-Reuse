@@ -11,6 +11,7 @@ if [ "$1" = "install" ]; then
     DOTENVERR=$(npm install dotenv 2>&1 > '/dev/null')
     NDJSONERR=$(npm install --save @types/ndjson 2>&1 > '/dev/null')
     JESTERR=$(npm install jest 2>&1 > '/dev/null')
+    ISOERR=$(npm install isomorphic-git 2>&1 > '/dev/null')
     # check for successful installs
     if [[ $TSERROR != '' ]]; then
         echo 'Error installing typescript'
@@ -33,8 +34,11 @@ if [ "$1" = "install" ]; then
     elif [[ $JESTERR != '' ]]; then
         echo 'Error installing jest'
         exit 1
+    elif [[ $ISOERR != '' ]]; then
+        echo 'Error installing isomorphic-git'
+        exit 1
     else
-        echo "6 dependencies successfully installed"
+        echo "8 dependencies successfully installed"
         exit 0
     fi
 
