@@ -23,9 +23,10 @@ export type data = {
 // input: raw data from REST API call
 // output: number from bus factor calculation [0, 1]
 export function BusFactor(rawData: data): number {
-    logger.log('debug', 'Calculating Bus Factor');
+    logger.log('info', 'Calculating Bus Factor');
     // check inputs for divide by 0
     if(rawData.totalPullRequests == 0) {
+        logger.log('debug', 'total pull requests 0')
         return 0;
     }
 
@@ -38,9 +39,10 @@ export function BusFactor(rawData: data): number {
 // input: raw data from REST API call
 // output: number from CORRECTNESS_SCORE calculation [0, 1]
 export function Correctness(rawData: data): number {
-    logger.log('debug', 'Calculating Correctness');
+    logger.log('info', 'Calculating Correctness');
     // check inputs for divide by 0
     if(rawData.totalissues == 0 || rawData.totalIssuesMonth == 0) {
+        logger.log('debug', 'Total issues or total issues this month 0');
         return 0;
     }
 
@@ -53,7 +55,7 @@ export function Correctness(rawData: data): number {
 // input: raw data from REST API call
 // output: number from ramp up calculation [0, 1]
 export function RampUp(rawData: data): number {
-    logger.log('debug', 'Calculating Ramp Up');
+    logger.log('info', 'Calculating Ramp Up');
     return (0.5 * rawData.quickStart) + (0.25 * rawData.examples) + (0.25 * rawData.usage);
 }
 
@@ -75,7 +77,7 @@ export function ResponsiveMaintainer(rawData: data): number {
 // input: raw data from REST API call
 // output: number from license calculation [0, 1]
 export function License(rawData: data): number {
-    logger.log('debug', 'Calculating License');
+    logger.log('info', 'Calculating License');
     let compliant: number = 1;  // compliance of license
     // check each license
     for(let idx: number = 0; idx < (rawData.licenses).length; idx++) {
@@ -91,7 +93,7 @@ export function License(rawData: data): number {
 // input: module with data from other metric calculations
 // output: number from net score calculation [0, 1]
 export function NetScore(module: module): number {
-    logger.log('debug', 'Calculating Net Score');
+    logger.log('info', 'Calculating Net Score');
     // calculate net score
     return ((0.3 * module.BUS_FACTOR_SCORE) + (0.25 * module.CORRECTNESS_SCORE) + (0.15 * module.RAMP_UP_SCORE) + (0.3 * module.RESPONSIVE_MAINTAINER_SCORE))
             * (module.LICENSE_SCORE);
@@ -109,17 +111,23 @@ export async function GenerateCalculations(currModule: module, npmFlag: boolean)
         logger.log('debug', 'Raw data for calculation from API: ' + JSON.stringify(rawData));
         // calculate each metric and update module object, round to 5 decimal places
         currModule.BUS_FACTOR_SCORE = +BusFactor(rawData).toFixed(5);
+        logger.log('debug', 'Calculated BUS_FACTOR_SCORE: ' + currModule.BUS_FACTOR_SCORE);
         currModule.CORRECTNESS_SCORE = +Correctness(rawData).toFixed(5);
+        logger.log('debug', 'Calculated CORRECTNESS SCORE: ' + currModule.CORRECTNESS_SCORE);
         currModule.RAMP_UP_SCORE = +RampUp(rawData).toFixed(5);
+        logger.log('debug', 'Calculated RAMP UP SCORE: ' + currModule.RAMP_UP_SCORE);
         currModule.RESPONSIVE_MAINTAINER_SCORE = +ResponsiveMaintainer(rawData).toFixed(5);
+        logger.log('debug', 'Calculated RESPONSIVE MAINTAINER SCORE: ' + currModule.RESPONSIVE_MAINTAINER_SCORE);
         currModule.LICENSE_SCORE = +License(rawData).toFixed(5);
+        logger.log('debug', 'Calculated LICENSE SCORE: ' + currModule.LICENSE_SCORE);
         currModule.NET_SCORE = +NetScore(currModule).toFixed(5);
+        logger.log('debug', 'Calculated NET_SCORE: ' + currModule.NET_SCORE);
 
         logger.log('info', 'Completed calculation for module: ' + currModule.URL);
         GenerateOutput(currModule);
     });
     response.catch((err) => {
-        console.log('info', 'Error in API call: ' + err);
+        logger.log('info', 'Error in API call: ' + err);
         GenerateOutput(currModule);
     });
 }

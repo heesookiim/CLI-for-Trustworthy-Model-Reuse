@@ -9,7 +9,8 @@ if [ "$1" = "install" ]; then
     AXIOSERR=$(npm install axios 2>&1 > '/dev/null')
     WINSTONERR=$(npm install winston 2>&1 > '/dev/null')
     DOTENVERR=$(npm install dotenv 2>&1 > '/dev/null')
-    NDJSON=$(npm install --save @types/ndjson 2>&1 > '/dev/null')
+    NDJSONERR=$(npm install --save @types/ndjson 2>&1 > '/dev/null')
+    JESTERR=$(npm install jest 2>&1 > '/dev/null')
     # check for successful installs
     if [[ $TSERROR != '' ]]; then
         echo 'Error installing typescript'
@@ -26,8 +27,11 @@ if [ "$1" = "install" ]; then
     elif [[ $DOTENVERR != '' ]]; then
         echo 'Error installing dotenv'
         exit 1
-    elif [[ $NDJSON != '' ]]; then
+    elif [[ $NDJSONERR != '' ]]; then
         echo 'Error installing ndjson type'
+        exit 1
+    elif [[ $JESTERR != '' ]]; then
+        echo 'Error installing jest'
         exit 1
     else
         echo "6 dependencies successfully installed"
@@ -38,15 +42,18 @@ if [ "$1" = "install" ]; then
 elif [ -f "$1" ]
 then
     TSC=$(tsc main.ts fetch.ts fileio.ts calculations.ts logging_cfg.ts 2>&1 > '/dev/null');
-    if [ $TSC != '' ]; then
+    if [[ $TSC != '' ]]; then
         echo "Files failed to compile"
         exit 1
     else
-        MAIN=$(node main.js "$1" 2>&1 '/dev/null')
-        if [ $MAIN != '' ]; then
+        if [[ "${LOG_FILE}" == '' ]]; then
+            echo "LOG_FILE not set"
             exit 1
-            echo "Files failed to run"
+        elif [[ "${GITHUB_TOKEN}" == '' ]]; then
+            echo "GITHUB_TOKEN not set"
+            exit 1
         else
+            node main.js $1
             exit 0
         fi
     fi
@@ -54,6 +61,20 @@ then
 # check if input is test
 elif [ "$1" = "test" ]
 then
+
+    #TEST=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 > '/dev/null')
+    #TEST=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 | tee /dev/tty)
+    #echo $TEST
+    #echo $COVERAGE_REPORT
+    #coverage_report=$(npx jest calculations.test.ts --coverage)
+    #line_coverage=$(echo "$coverage_report" | grep -oP 'Lines:\s+\K[0-9.]+%' | sed 's/%//')
+
+    #echo "Line coverage: $line_coverage"
+    #COVERAGE_RAW=$(npx jest calculations.test.ts --coverage --coverageReporters="text-summary" )
+    #echo "$COVERAGE_RAW" | awk -F'/| ' '/Branches/{print $(NF-1)}'
+
+    # COVERAGE=$(npx jest calculations.test.ts --coverage --silent)
+    #echo $COVERAGE
     #echo "Running the test suite"
     #insert call to test suite
     exit 0
