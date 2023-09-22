@@ -1,0 +1,20 @@
+{
+  "name": "readme_analysis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc github-readme-extractor.ts && node github-readme-extractor.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.5.0",
+    "dotenv": "^16.3.1",
+    "isomorphic-git": "^1.24.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.3"
+  }
+}
