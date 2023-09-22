@@ -3,3 +3,6 @@
 rest-api-with-github/node_modules
 *.js
 .env
+*.txt
+*.py
+node_modules

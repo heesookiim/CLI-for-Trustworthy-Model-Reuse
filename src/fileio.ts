@@ -89,12 +89,13 @@ function FindOtherModules(URLsList: string[]): module[] {
 // prints NDJSON output to stdout
 export function GenerateOutput(currModule: module) {
     logger.log('debug', 'Generating output for link: ' + currModule.URL);
-
+    
     // set up ndjson output
     const output = ndjson.stringify();
     output.pipe(process.stdout);
     output.write(currModule);
     output.end();
+    //logger.log('debug', 'Output success: ' + outputScucess);
 }
 
 // primary function for handling input, output and calculations
@@ -117,6 +118,12 @@ export function URLFileHandler(file: string) {
     let gitModuleList: module[] = FindGitModules(URLsList);
     let npmModuleList: module[] = FindNPMModules(URLsList);
     let otherModuleList: module[] = FindOtherModules(URLsList);
+
+    // output other module links
+    logger.log('info', 'Outputting other links');
+    for(let idx: number = 0; idx < otherModuleList.length; idx++) {
+        GenerateOutput(otherModuleList[idx]);
+    }
 
     // complete calculations
     // generate output as each calculation finishes

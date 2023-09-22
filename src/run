@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source .env
 # need to add writes to log file
 # check if input is install
 if [ "$1" = "install" ]; then
@@ -38,17 +39,24 @@ if [ "$1" = "install" ]; then
 elif [ -f "$1" ]
 then
     TSC=$(tsc main.ts fetch.ts fileio.ts calculations.ts logging_cfg.ts 2>&1 > '/dev/null');
-    if [ $TSC != '' ]; then
+    if [[ $TSC != '' ]]; then
         echo "Files failed to compile"
         exit 1
     else
-        MAIN=$(node main.js "$1" 2>&1 '/dev/null')
-        if [ $MAIN != '' ]; then
+        if [ -f !LOG_FILE ]; then
+            echo "LOG_FILE not set"
             exit 1
-            echo "Files failed to run"
         else
+            node main.js $1
             exit 0
         fi
+        #if [ -f "${LOG_FILE}" ]; then
+        #    node main.js $1
+        #    exit 0
+        #else
+        #    echo "Provide valid Log File"
+        #    exit 1
+        #fi
     fi
 
 # check if input is test
