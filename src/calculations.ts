@@ -93,8 +93,8 @@ export function License(rawData: data): number {
 export function NetScore(module: module): number {
     logger.log('debug', 'Calculating Net Score');
     // calculate net score
-    return ((0.4 * module.BUS_FACTOR_SCORE) + (0.15 * module.CORRECTNESS_SCORE) + (0.15 * module.RAMP_UP_SCORE) + (0.3 * module.RESPONSIVE_MAINTAINER_SCORE))
-            - (1 * (1 - module.LICENSE_SCORE));
+    return ((0.3 * module.BUS_FACTOR_SCORE) + (0.25 * module.CORRECTNESS_SCORE) + (0.15 * module.RAMP_UP_SCORE) + (0.3 * module.RESPONSIVE_MAINTAINER_SCORE))
+            * (module.LICENSE_SCORE);
 }
 
 // new development - handle one function at once in async function
