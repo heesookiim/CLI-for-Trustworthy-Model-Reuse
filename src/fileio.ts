@@ -1,6 +1,7 @@
-import * as fs from 'fs'
-import { GenerateCalculations } from './calculations'
-import { logger } from '../logging_cfg';
+import * as fs from 'fs';
+import * as ndjson from 'ndjson';
+import { GenerateCalculations } from './calculations';
+import { logger } from './logging_cfg';
 
 // object to hold data for each module
 export type module = {
@@ -88,7 +89,12 @@ function FindOtherModules(URLsList: string[]): module[] {
 // prints NDJSON output to stdout
 export function GenerateOutput(currModule: module) {
     logger.log('debug', 'Generating output for link: ' + currModule.URL);
-    console.log(JSON.stringify(currModule) + '\n');
+
+    // set up ndjson output
+    const output = ndjson.stringify();
+    output.pipe(process.stdout);
+    output.write(currModule);
+    output.end();
 }
 
 // primary function for handling input, output and calculations
@@ -126,10 +132,4 @@ export function URLFileHandler(file: string) {
         logger.log('debug', 'Sending link to calculations.ts: ' + npmModuleList[idx].URL);
         GenerateCalculations(npmModuleList[idx], true);
     }
-
-    // generate output and print to stdout
-    // combine module lists into one for output
-    //logger.log('info', 'Calling output generation');
-    //let moduleList: module[] = gitModuleList.concat(npmModuleList, otherModuleList);
-    //GenerateOutput(moduleList);
 }

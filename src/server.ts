@@ -1,6 +1,7 @@
 // Imports
 import { data } from './calculations';
 import { fetch_METRIC_data, getLink, convertLink } from './fetch';
+import { logger } from './logging_cfg'
 
 // If there's a link for a npm package, set the flag to true and add the link
 export async function API(link: string, npmFlag: boolean): Promise<data> {
@@ -26,12 +27,12 @@ export async function API(link: string, npmFlag: boolean): Promise<data> {
     if (userData) {
         rawData.closedIssues = userData.ClosedIssuesInLastTwoWeeks;
         rawData.openIssues = userData.OpenIssues;
-        console.log('GitHub Repo Data:');
+        /*console.log('GitHub Repo Data:');
         console.log('ClosedIssuesInLastTwoWeeks:', userData.ClosedIssuesInLastTwoWeeks);
-        console.log('OpenIssues:', userData.OpenIssues);
+        console.log('OpenIssues:', userData.OpenIssues);*/
+        logger.log('info', 'Fetched Github user data');
     } else {
-        // change to log file
-        console.log('Failed to fetch GitHub user data.');
+        logger.log('info', 'Failed to fetch GitHub user data');        
     }
 
     return rawData;

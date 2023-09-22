@@ -1,5 +1,5 @@
 import { module, GenerateOutput } from './fileio';
-import { logger } from '../logging_cfg';
+import { logger } from './logging_cfg';
 import { API } from './server';
 
 // object to hold raw data for each module
@@ -101,7 +101,7 @@ export function NetScore(module: module): number {
 // input: module with URL filled in
 // output: module with all fields filled in
 export async function GenerateCalculations(currModule: module, npmFlag: boolean) {
-    console.log('info', 'Working on link: ' + currModule.URL);
+    logger.log('info', 'Working on link: ' + currModule.URL);
     // call API for given module
     const response = Promise.resolve(API(currModule.URL, npmFlag));
     response.then((data) => {

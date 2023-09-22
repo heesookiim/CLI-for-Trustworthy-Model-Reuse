@@ -1,6 +1,7 @@
 // Imports
 import axios from 'axios';
 import * as dotenv from 'dotenv';
+import { logger } from './logging_cfg'
 dotenv.config();
 
 const personalAccessToken = process.env.GITHUB_TOKEN; // personalAccessToken stored locally
@@ -46,7 +47,7 @@ async function fetch_METRIC_data(apiLink: string): Promise<METRIC_1 | null> {
         if (issueResponse.status === 200) {
             allClosedIssues = allClosedIssues.concat(issueResponse.data);
         } else {
-            console.error('Failed to fetch data from the GitHub API');
+            logger.log('info', 'Failed to fetch data from the GitHub API');
         }
     }
 
@@ -137,7 +138,7 @@ async function getLink(npmLink: string) {
 function convertLink(githubLink: string) {
     // Split the GitHub link into 3 parts
     const linkParts = githubLink.split('/');
-    console.log(`GitHub link parts: ${linkParts}`);
+    logger.log('debug', `GitHub link parts: ${linkParts}`);
     // The owner of the repository is the second part
     const owner = linkParts[3];
 
@@ -147,7 +148,7 @@ function convertLink(githubLink: string) {
     // Construct the GitHub API link from the owner and repository name
     const githubApiLink = `https://api.github.com/repos/${owner}/${repoName}`;
 
-    console.log(`GitHub API link: ${githubApiLink}`);
+    logger.log('debug', `GitHub API link: ${githubApiLink}`);
     return githubApiLink;
 } 
 
