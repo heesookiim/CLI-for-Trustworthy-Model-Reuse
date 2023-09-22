@@ -1,6 +1,6 @@
 // Imports
 import { data } from './calculations';
-import { fetch_METRIC_data, getLink, convertLink } from './fetch';
+import { fetch_METRICS, getLink, convertLink } from './fetch';
 
 // If there's a link for a npm package, set the flag to true and add the link
 export async function API(link: string, npmFlag: boolean): Promise<data> {
@@ -18,15 +18,14 @@ export async function API(link: string, npmFlag: boolean): Promise<data> {
         quickStart: 0, examples: 0, usage: 0, closedIssues: 0, openIssues: 0, licenses: []};
     
     // Link for any repo
-    // Calling the main fetch function for Metric 1
-    const userData = await fetch_METRIC_data(githubApiLink);
+    const userData = await fetch_METRICS(githubApiLink);
 
     // Printing the results of fetch_METRIC_1
     if (userData) {
         //rawData.closedIssues = userData.ClosedIssuesInLastTwoWeeks;
-        console.log('GitHub Repo Data:');
-        console.log('ClosedIssuesInLastTwoWeeks:', userData.ClosedIssuesInLastTwoWeeks);
-        console.log('OpenIssues:', userData.OpenIssues);
+        // console.log('GitHub Repo Data:');
+        // console.log('ClosedIssuesInLastTwoWeeks:', userData.ClosedIssuesInLastTwoWeeks);
+        // console.log('OpenIssues:', userData.OpenIssues);
     } else {
         // change to log file
         console.log('Failed to fetch GitHub user data.');
