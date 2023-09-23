@@ -107,12 +107,6 @@ export function GenerateOutput(currModule: module) {
 // output: error or NDJSON to stdout
 export function URLFileHandler(file: string) {
     logger.log('info', 'Entered fileio.ts');
-    // check for file existing
-    if(!fs.existsSync(file)) {
-        // needs to be changed to logging
-        logger.log('info', 'Error: file does not exist at provided path');
-        return 1;
-    }
 
     // split file into array of strings
     let URLsList: string[] = ReadFile(file);
