@@ -119,6 +119,24 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
                 Authorization: `token ${personalAccessToken}`,
             },
         });
+        
+        if (responseIssue.status != 200) {
+            logger.log('info', "No Issue Server Response in fetch.ts") // to be removed later
+            logger.log(`info`, `NO SERVER RESPONSE`);
+            let exportMetric: MetricData = {
+                totalPullers365: -1, // number of active contributors, last 365 days [bus factor]
+                mostPulls365: -1, // most active contributor's pull request count, last 365 days [bus factor]
+                totalPulls365: -1, // number of pull requests, last 365 days [bus factor]
+                issuesClosed: -1, // number of closed issues [correctness]
+                issuesTotal: -1, // total number of issues [correctness]
+                issuesClosed30: -1, // number of closed issues, last 30 days [correctness]
+                issuesTotal30: -1, // total number of issues, last 30 days [correctness]
+                issuesClosed14: -1, // number of closed issues, last 14 days [responsive maintainer]
+                issuesOpen: -1, // number of open issues [responsive maintainer]
+            };
+            return exportMetric;
+            break;
+        }
 
         // the next 6 arrays are created to store specific data from the response
         // GitHub's REST API considers every pull request an issue, but not every issue is a pull request.
@@ -169,10 +187,7 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
         // goes to the next page
         pageNumberIssue++;
 
-        if (responseIssue.status != 200) {
-            logger.log(`info`, `NO SERVER RESPONSE`);
-            break;
-        }
+        
 
     }
 
@@ -209,6 +224,24 @@ async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
                 Authorization: `token ${personalAccessToken}`,
             },
         });
+        
+        if (responsePull.status != 200) {
+            logger.log('info', "No Pull Request Server Response in fetch.ts") // to be removed later
+            logger.log(`info`, `NO SERVER RESPONSE`);
+            let exportMetric: MetricData = {
+                totalPullers365: -1, // number of active contributors, last 365 days [bus factor]
+                mostPulls365: -1, // most active contributor's pull request count, last 365 days [bus factor]
+                totalPulls365: -1, // number of pull requests, last 365 days [bus factor]
+                issuesClosed: -1, // number of closed issues [correctness]
+                issuesTotal: -1, // total number of issues [correctness]
+                issuesClosed30: -1, // number of closed issues, last 30 days [correctness]
+                issuesTotal30: -1, // total number of issues, last 30 days [correctness]
+                issuesClosed14: -1, // number of closed issues, last 14 days [responsive maintainer]
+                issuesOpen: -1, // number of open issues [responsive maintainer]
+            };
+            return exportMetric;
+            break;
+        }
 
         const usernamesThisFetch = responsePull.data
                 .filter((pull_request: any) => new Date(pull_request.created_at) >= date365) // filtering for only issues in the last year
@@ -233,11 +266,7 @@ async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
         // goes to the next page
         pageNumberPull++;
 
-        if (responsePull.status != 200) {
-            logger.log('info', "No Pull Request Server Response in fetch.ts") // to be removed later
-            logger.log(`info`, `NO SERVER RESPONSE`);
-            break;
-        }
+        
     }
 
     // attaches a number to each username which contains the number of times they had pull requests
