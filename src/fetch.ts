@@ -118,6 +118,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
             } else {
                 //console.log("No Issue Server Response in fetch.ts") // to be removed later
                 //logger.log(`info`, `NO SERVER RESPONSE`);
+                console.log(`Incorrect Behaviour`);
                 break;
             }
 
@@ -130,6 +131,22 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
         console.log(`issuesClosed14 : ${issuesClosed14}`);
         console.log(`issuesOpen : ${issuesOpen}`);
         */
+
+        let exportMetric: MetricData = {
+            totalPullers365: totalPullers365, // number of active contributors, last 365 days [bus factor]
+            mostPulls365: mostPulls365, // most active contributor's pull request count, last 365 days [bus factor]
+            totalPulls365: totalPulls365, // number of pull requests, last 365 days [bus factor]
+            issuesClosed: issuesClosed, // number of closed issues [correctness]
+            issuesTotal: issuesTotal, // total number of issues [correctness]
+            issuesClosed30: issuesClosed30, // number of closed issues, last 30 days [correctness]
+            issuesTotal30: issuesTotal30, // total number of issues, last 30 days [correctness]
+            issuesClosed14: issuesClosed14, // number of closed issues, last 14 days [responsive maintainer]
+            issuesOpen: issuesOpen, // number of open issues [responsive maintainer]
+        };
+        console.log(exportMetric);
+        // export
+        return exportMetric;
+
     }
 
     // Function to fetch pulls
@@ -210,27 +227,12 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
         console.log(`mostPulls365 : ${mostPulls365}`);
         console.log(`totalPulls365 : ${totalPulls365}`);
         */
+
     }
 
     // calls the 2 functions
-    fetchIssues();
     fetchPulls();
-
-    // creates an object of the interface and exports it after assigning the correct data
-    let exportMetric: MetricData = {
-        totalPullers365: totalPullers365, // number of active contributors, last 365 days [bus factor]
-        mostPulls365: mostPulls365, // most active contributor's pull request count, last 365 days [bus factor]
-        totalPulls365: totalPulls365, // number of pull requests, last 365 days [bus factor]
-        issuesClosed: issuesClosed, // number of closed issues [correctness]
-        issuesTotal: issuesTotal, // total number of issues [correctness]
-        issuesClosed30: issuesClosed30, // number of closed issues, last 30 days [correctness]
-        issuesTotal30: issuesTotal30, // total number of issues, last 30 days [correctness]
-        issuesClosed14: issuesClosed14, // number of closed issues, last 14 days [responsive maintainer]
-        issuesOpen: issuesOpen, // number of open issues [responsive maintainer]
-    };
-    
-    // export
-    return exportMetric;
+    fetchIssues();
 
 }
 
