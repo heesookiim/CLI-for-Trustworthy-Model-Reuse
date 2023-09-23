@@ -61,7 +61,7 @@ export async function ReadMeExtractor(githubRepoUrl: string): Promise<number[]> 
 
 function deletePath(localRepoPath: string) {
   // Delete the local repository
-  logger.log('debug', `\nDeleting ${localRepoPath}...`);
+  logger.log('debug', `Deleting ${localRepoPath}...`);
   fs.rm(localRepoPath, { recursive: true }, (err) => {
     if(err){
         // File deletion failed

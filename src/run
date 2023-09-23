@@ -45,7 +45,7 @@ if [ "$1" = "install" ]; then
 # check if input is a file
 elif [ -f "$1" ]
 then
-    TSC=$(tsc main.ts fetch.ts fileio.ts calculations.ts logging_cfg.ts 2>&1 > '/dev/null');
+    TSC=$(tsc main.ts 2>&1 > '/dev/null');
     if [[ $TSC != '' ]]; then
         echo "Files failed to compile"
         exit 1
@@ -57,30 +57,38 @@ then
             echo "GITHUB_TOKEN not set"
             exit 1
         else
-            node main.js $1
-            exit 0
+            MAIN=$(node main.js $1);
+            if [[ $MAIN == '' ]]; then
+                exit 1
+            else
+                echo $MAIN
+                exit 0
+            fi
         fi
     fi
 
 # check if input is test
 elif [ "$1" = "test" ]
 then
-    TEST=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 > '/dev/null')
-    #TEST=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 | tee /dev/tty)
-    #echo $TEST
-    #echo $COVERAGE_REPORT
-    #coverage_report=$(npx jest calculations.test.ts --coverage)
-    #line_coverage=$(echo "$coverage_report" | grep -oP 'Lines:\s+\K[0-9.]+%' | sed 's/%//')
+    # run test suite for coverage and number of tests passed 
+    TEST1=$(npx jest calculations.test.ts --collectCoverage --coverageReporters="json-summary" 2>&1 > '/dev/null')
+    TEST2=$(npx jest calculations.test.ts --json >> tests.json 2>&1 > '/dev/null')
 
-    #echo "Line coverage: $line_coverage"
-    #COVERAGE_RAW=$(npx jest calculations.test.ts --coverage --coverageReporters="text-summary" )
-    #echo "$COVERAGE_RAW" | awk -F'/| ' '/Branches/{print $(NF-1)}'
-
-    # COVERAGE=$(npx jest calculations.test.ts --coverage --silent)
-    #echo $COVERAGE
-    #echo "Running the test suite"
-    #insert call to test suite
-    exit 0
+    # generate proper output
+    TSCTEST=$(tsc testParse.ts 2>&1 > '/dev/null');
+    if [[ $TSCTEST != '' ]]; then
+        echo "Files failed to compile"
+        exit 1
+    else
+        TESTPARSE=$(node testParse.js);
+        if [[ $TESTPARSE == 'Test suite was note executed' ]]; then
+            echo $TESTPARSE
+            exit 1
+        else
+            echo $TESTPARSE
+            exit 0
+        fi
+    fi
 
 # invalid input
 else
