@@ -10,7 +10,7 @@ if [ "$1" = "install" ]; then
     WINSTONERR=$(npm install winston 2>&1 > '/dev/null')
     DOTENVERR=$(npm install dotenv 2>&1 > '/dev/null')
     NDJSONERR=$(npm install --save @types/ndjson 2>&1 > '/dev/null')
-    JESTERR=$(npm install jest 2>&1 > '/dev/null')
+    JESTERR=$(npm install --save-dev jest 2>&1 > '/dev/null')
     ISOERR=$(npm install isomorphic-git 2>&1 > '/dev/null')
     # check for successful installs
     if [[ $TSERROR != '' ]]; then
@@ -65,8 +65,7 @@ then
 # check if input is test
 elif [ "$1" = "test" ]
 then
-
-    #TEST=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 > '/dev/null')
+    TEST=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 > '/dev/null')
     #TEST=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 | tee /dev/tty)
     #echo $TEST
     #echo $COVERAGE_REPORT
