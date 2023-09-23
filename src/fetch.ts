@@ -6,6 +6,17 @@ dotenv.config();
 
 const personalAccessToken = process.env.GITHUB_TOKEN; // personalAccessToken stored locally
 
+interface MetricData {
+    totalPullers365?: number; // number of active contributors, last 365 days [bus factor]
+    mostPulls365?: number; // most active contributor's pull request count, last 365 days [bus factor]
+    totalPulls365?: number; // number of pull requests, last 365 days [bus factor]
+    issuesClosed?: number; // number of closed issues [correctness]
+    issuesTotal?: number; // total number of issues [correctness]
+    issuesClosed30?: number; // number of closed issues, last 30 days [correctness]
+    issuesTotal30?: number; // total number of issues, last 30 days [correctness]
+    issuesClosed14?: number; // number of closed issues, last 14 days [responsive maintainer]
+    issuesOpen?: number; // number of open issues [responsive maintainer]
+}
 
 // Creates 3 dates and configures it to be:
 const date14 = new Date();
@@ -23,17 +34,6 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
     // different metrics from the GitHub API
     // format of comments:
     // description, specific-description?  [for-which-metric]
-    interface MetricData {
-        totalPullers365: number; // number of active contributors, last 365 days [bus factor]
-        mostPulls365: number; // most active contributor's pull request count, last 365 days [bus factor]
-        totalPulls365: number; // number of pull requests, last 365 days [bus factor]
-        issuesClosed: number; // number of closed issues [correctness]
-        issuesTotal: number; // total number of issues [correctness]
-        issuesClosed30: number; // number of closed issues, last 30 days [correctness]
-        issuesTotal30: number; // total number of issues, last 30 days [correctness]
-        issuesClosed14: number; // number of closed issues, last 14 days [responsive maintainer]
-        issuesOpen: number; // number of open issues [responsive maintainer]
-    }
 
     const MetricDataPartial1: MetricData =  {
         issuesClosed: 0, // number of closed issues [correctness]
@@ -71,7 +71,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
     return exportMetric;
 }
 
-async function fetchIssues(apiLink: string, MetricDataPartial1) {
+async function fetchIssues(apiLink: string, MetricDataPartial1: MetricData) {
 
     //console.log(`Entering fetchIssues function`);
     let issuesClosed = 0; // number of closed issues [correctness]
@@ -130,7 +130,7 @@ async function fetchIssues(apiLink: string, MetricDataPartial1) {
             issuesClosed += issuesClosed_Array.length;
             issuesTotal += issuesTotal_Array.length;
             issuesClosed30 += issuesClosed30_Array.length;
-            issuesTotal30 += issuesClosed30_Array.length;
+            issuesTotal30 += issuesTotal30_Array.length;
             issuesClosed14 += issuesClosed14_Array.length;
             issuesOpen += issuesOpen_Array.length;
 
@@ -163,7 +163,7 @@ async function fetchIssues(apiLink: string, MetricDataPartial1) {
 }
 
 // Function to fetch pulls
-async function fetchPulls(apiLink: string, MetricDataPartial2) {
+async function fetchPulls(apiLink: string, MetricDataPartial2: MetricData) {
 
     //console.log(`Entering fetchPulls function`);
 
