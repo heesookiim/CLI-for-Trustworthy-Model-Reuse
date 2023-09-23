@@ -144,3 +144,11 @@ export function URLFileHandler(file: string) {
         GenerateCalculations(npmModuleList[idx], true);
     }
 }
+
+// export functions for testing
+export {
+    ReadFile,
+    FindGitModules,
+    FindNPMModules,
+    FindOtherModules
+  };
