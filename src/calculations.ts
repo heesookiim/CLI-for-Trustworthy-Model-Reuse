@@ -78,6 +78,10 @@ export function ResponsiveMaintainer(rawData: data): number {
 // output: number from license calculation [0, 1]
 export function License(rawData: data): number {
     logger.log('info', 'Calculating License');
+    // license couldn't be found
+    if(rawData.licenses.length == 0) {
+        return 0;
+    }
     let compliant: number = 1;  // compliance of license
     // check each license
     for(let idx: number = 0; idx < (rawData.licenses).length; idx++) {

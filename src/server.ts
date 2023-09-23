@@ -25,13 +25,27 @@ export async function API(link: string, npmFlag: boolean): Promise<data> {
 
     // get readme data
     const response = await ReadMeExtractor(link);
-    rawData.quickStart = response[0];
-    rawData.examples = response[1];
-    rawData.usage = response[2];
+    if(response) {
+        rawData.quickStart = response[0];
+        rawData.examples = response[1];
+        rawData.usage = response[2];
+    } else {
+        logger.log('info', 'Failed to fetch readme data');
+    }
 
     // Printing the results of fetch_METRIC_1
     if (userData) {
         logger.log('info', 'Fetched Github user data');
+        rawData.contrubtorMostPullRequests = userData.mostPulls365;
+        rawData.totalPullRequests = userData.totalPulls365;
+        rawData.activeContributors = userData.totalPullers365;
+        rawData.totalClosedIssues = userData.issuesClosed;
+        rawData.totalissues = userData.issuesTotal;
+        rawData.totalClosedIssuesMonth = userData.issuesClosed30;
+        rawData.totalIssuesMonth = userData.issuesTotal30;
+        rawData.closedIssues = userData.issuesClosed14;
+        rawData.openIssues = userData.issuesOpen;
+
     } else {
         logger.log('info', 'Failed to fetch GitHub user data');        
     }
