@@ -38,6 +38,6 @@ try {
 
 // Tests were not performed
 catch(err) {
-    process.stdout.write('Test suite was note executed');
+    process.stdout.write('Test suite was not executed');
     logger.log('info', 'Test suite was not executed');
 }

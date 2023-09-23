@@ -99,7 +99,6 @@ export function GenerateOutput(currModule: module) {
     output.pipe(process.stdout);
     output.write(currModule);
     output.end();
-    //logger.log('debug', 'Output success: ' + outputScucess);
 }
 
 // primary function for handling input, output and calculations
