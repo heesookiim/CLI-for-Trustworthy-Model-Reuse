@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import { logger } from './logging_cfg';
 
+let exitValue = 1;
+
 // parse output from tests for output
 try {
     // get data for number of tests performed
@@ -13,7 +15,9 @@ try {
         const parsedTest = JSON.parse(test);
         const parsedCoverage = JSON.parse(coverage);
         process.stdout.write(`${parsedTest.numPassedTests}/${parsedTest.numTotalTests} test cases passed. ${parsedCoverage.total.lines.pct}% line coverage achieved.`);
-
+        
+        logger.log('debug', `${parsedTest.numPassedTests}/${parsedTest.numTotalTests} test cases passed.`);
+        logger.log('debug', `${parsedCoverage.total.lines.pct}% line coverage achieved.`);
         logger.log('info', 'Retrieved data from tests');
     }
     else {
