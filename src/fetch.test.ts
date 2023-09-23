@@ -1,5 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { fetch_METRICS, getLink, convertLink } from './fetch';
+import { fetch_METRICS, getLink, convertLink, linkValidator } from './fetch';
 
 // Mock axios to simulate API responses
 jest.mock('axios');
@@ -44,17 +43,15 @@ test('should convert a GitHub link to the GitHub API link', () => {
     expect(result).toBe('https://api.github.com/repos/cloudinary/cloudinary_npm');
 });
 
+//linkValidator function
 test('should convert a GitHub link to the GitHub API link', () => {
-    const githubLink = 'https://api.github.com/repos/cloudinary/xyz';
-    const MetricDataPartial1 = {
-        issuesClosed: 0, // number of closed issues [correctness]
-        issuesTotal: 0, // total number of issues [correctness]
-        issuesClosed30: 0, // number of closed issues, last 30 days [correctness]
-        issuesTotal30: 0, // total number of issues, last 30 days [correctness]
-        issuesClosed14: 0, // number of closed issues, last 14 days [responsive maintainer]
-        issuesOpen: 0, // number of open issues [responsive maintainer]
-    };
-    const result = fetchIssues(githubLink, MetricDataPartial1);
-    expect(result).toBe(400);
+    const githubLink = 'https://github.com/lodash/lodash';
+    const githubLink_invalid = 'https://github.com/lodash/wncpne';
+    const valid = linkValidator(githubLink);
+    const invalid = linkValidator(githubLink_invalid);
+    expect(valid).toBe(200);
+    expect(invalid).toBe(400);
 });
+
+
 
