@@ -73,7 +73,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
 
 async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
 
-    //console.log(`Entering fetchIssues function`);
+    logger.log('info', `Entering fetchIssues function`);
     let issuesClosed = 0; // number of closed issues [correctness]
     let issuesTotal = 0; // total number of issues [correctness]
     let issuesClosed30 = 0; // number of closed issues, last 30 days [correctness]
@@ -135,7 +135,7 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
             issuesOpen += issuesOpen_Array.length;
 
             // Higher Logging Level
-            // console.log(`Completed Issues: ${issuesTotal}`)
+            logger.log('debug', `Completed Issues: ${issuesTotal}`)
 
             // break condition to exit the while loop
             // exits in the first iteration if the issues in the first page are less than ${per_page}
@@ -145,9 +145,7 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
             // goes to the next page
             pageNumberIssue++;
         } else {
-            //console.log("No Issue Server Response in fetch.ts") // to be removed later
-            //logger.log(`info`, `NO SERVER RESPONSE`);
-            console.log(`Incorrect Behaviour`);
+            logger.log(`info`, `NO SERVER RESPONSE`);
             break;
         }
 
@@ -165,7 +163,7 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
 // Function to fetch pulls
 async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
 
-    //console.log(`Entering fetchPulls function`);
+    logger.log('info', `Entering fetchPulls function`);
 
     let pageNumberPull = 1; // page number of which the pulls are being shown
     let contributors: string[] = []; // contains usernames of different usernames from all pull requests, in the last year
@@ -202,7 +200,7 @@ async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
             });
 
             // Higher Logging Level
-            // console.log(`Completed Pull Requests (From Last Year): ${totalPulls365}`)
+            logger.log('debug', `Completed Pull Requests (From Last Year): ${totalPulls365}`)
 
             // break condition to exit the while loop
             // exits in the first iteration if the pull requests in the first page are less than ${per_page}
@@ -212,7 +210,7 @@ async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
             // goes to the next page
             pageNumberPull++;
         } else {
-            //console.log("No Pull Request Server Response in fetch.ts") // to be removed later
+            logger.log('info', "No Pull Request Server Response in fetch.ts") // to be removed later
             logger.log(`info`, `NO SERVER RESPONSE`);
             break;
         }
@@ -264,7 +262,7 @@ async function getLink(npmLink: string) {
             }
         }
     } catch (error: any) {
-        //console.error(`Error: ${error.message}`);
+        logger.error('info', `Error: ${error.message}`);
     }
 
     // Return null if the GitHub link couldn't be retrieved

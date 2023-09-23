@@ -19,11 +19,11 @@ export async function ReadMeExtractor(githubRepoUrl: string): Promise<number[]> 
             logger.log('info', err.message);
             return;
         }
-        //console.log("File deleted successfully");
+        logger.log('info', "Cloned local repo deleted successfully");
       })};
 
     // Clone the repository
-    //console.log('Cloning repository...\n');
+    logger.log('info', 'Cloning repository...');
     await git.clone({
       fs,
       http,
@@ -37,8 +37,8 @@ export async function ReadMeExtractor(githubRepoUrl: string): Promise<number[]> 
     const readmeContent = fs.readFileSync(readmePath, 'utf-8');
 
     // Log the entire README content
-    // console.log('README Content:');
-    // console.log(readmeContent);
+    // logger.log('debug', 'README Content:');
+    // logger.log('debug', readmeContent);
 
     // Extract information
     const quickStartFound: number = checkQuickStart(readmeContent);
@@ -68,8 +68,8 @@ function deletePath(localRepoPath: string) {
         logger.log('info', err.message);
         return;
     }
-    logger.log('info', "File deleted successfully\n");
   });
+  logger.log('info', "File deleted successfully");
 }
 
 function checkQuickStart(content: string): number {
