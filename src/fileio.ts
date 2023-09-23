@@ -23,6 +23,10 @@ function ReadFile(file: string): string[] {
     // read file contents
     let URLs: string = fs.readFileSync(file, 'utf-8');
     let URLsList: string[] = URLs.split('\n');
+    // remove extra line from list
+    if(URLsList[URLsList.length - 1] == '') {
+        URLsList.pop();
+    }
     return URLsList;
 }
 
