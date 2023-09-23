@@ -6,31 +6,6 @@ dotenv.config();
 
 const personalAccessToken = process.env.GITHUB_TOKEN; // personalAccessToken stored locally
 
-// different metrics from the GitHub API
-// format of comments:
-// description, specific-description?  [for-which-metric]
-interface MetricData {
-    totalPullers365: number; // number of active contributors, last 365 days [bus factor]
-    mostPulls365: number; // most active contributor's pull request count, last 365 days [bus factor]
-    totalPulls365: number; // number of pull requests, last 365 days [bus factor]
-    issuesClosed: number; // number of closed issues [correctness]
-    issuesTotal: number; // total number of issues [correctness]
-    issuesClosed30: number; // number of closed issues, last 30 days [correctness]
-    issuesTotal30: number; // total number of issues, last 30 days [correctness]
-    issuesClosed14: number; // number of closed issues, last 14 days [responsive maintainer]
-    issuesOpen: number; // number of open issues [responsive maintainer]
-}
-
-// variables
-let totalPullers365 = 0; // number of active contributors, last 365 days [bus factor]
-let mostPulls365 = 0; // most active contributor's pull request count, last 365 days [bus factor]
-let totalPulls365 = 0; // number of pull requests, last 365 days [bus factor]
-let issuesClosed = 0; // number of closed issues [correctness]
-let issuesTotal = 0; // total number of issues [correctness]
-let issuesClosed30 = 0; // number of closed issues, last 30 days [correctness]
-let issuesTotal30 = 0; // total number of issues, last 30 days [correctness]
-let issuesClosed14 = 0; // number of closed issues, last 14 days [responsive maintainer]
-let issuesOpen = 0; // number of open issues [responsive maintainer]
 
 // Creates 3 dates and configures it to be:
 const date14 = new Date();
@@ -45,20 +20,50 @@ date365.setDate(date365.getDate() - 365); // (Today - 365 Days) ~ 1 year
 // Returns an interface of type MetricData,
 async function fetch_METRICS(apiLink: string): Promise<MetricData> {
 
+    // different metrics from the GitHub API
+    // format of comments:
+    // description, specific-description?  [for-which-metric]
+    interface MetricData {
+        totalPullers365: number; // number of active contributors, last 365 days [bus factor]
+        mostPulls365: number; // most active contributor's pull request count, last 365 days [bus factor]
+        totalPulls365: number; // number of pull requests, last 365 days [bus factor]
+        issuesClosed: number; // number of closed issues [correctness]
+        issuesTotal: number; // total number of issues [correctness]
+        issuesClosed30: number; // number of closed issues, last 30 days [correctness]
+        issuesTotal30: number; // total number of issues, last 30 days [correctness]
+        issuesClosed14: number; // number of closed issues, last 14 days [responsive maintainer]
+        issuesOpen: number; // number of open issues [responsive maintainer]
+    }
+
+    const MetricDataPartial1: MetricData =  {
+        issuesClosed: 0, // number of closed issues [correctness]
+        issuesTotal: 0, // total number of issues [correctness]
+        issuesClosed30: 0, // number of closed issues, last 30 days [correctness]
+        issuesTotal30: 0, // total number of issues, last 30 days [correctness]
+        issuesClosed14: 0, // number of closed issues, last 14 days [responsive maintainer]
+        issuesOpen: 0, // number of open issues [responsive maintainer]
+    };
+
+    const MetricDataPartial2: MetricData =  {
+        totalPullers365: 0, // number of active contributors, last 365 days [bus factor]
+        mostPulls365: 0, // most active contributor's pull request count, last 365 days [bus factor]
+        totalPulls365: 0, // number of pull requests, last 365 days [bus factor]
+    };
+
     // calls the 2 functions
-    await fetchIssues(apiLink);
-    await fetchPulls(apiLink);
+    await fetchIssues(apiLink, MetricDataPartial1);
+    await fetchPulls(apiLink, MetricDataPartial2);
 
     let exportMetric: MetricData = {
-        totalPullers365: totalPullers365, // number of active contributors, last 365 days [bus factor]
-        mostPulls365: mostPulls365, // most active contributor's pull request count, last 365 days [bus factor]
-        totalPulls365: totalPulls365, // number of pull requests, last 365 days [bus factor]
-        issuesClosed: issuesClosed, // number of closed issues [correctness]
-        issuesTotal: issuesTotal, // total number of issues [correctness]
-        issuesClosed30: issuesClosed30, // number of closed issues, last 30 days [correctness]
-        issuesTotal30: issuesTotal30, // total number of issues, last 30 days [correctness]
-        issuesClosed14: issuesClosed14, // number of closed issues, last 14 days [responsive maintainer]
-        issuesOpen: issuesOpen, // number of open issues [responsive maintainer]
+        totalPullers365: MetricDataPartial2.totalPullers365, // number of active contributors, last 365 days [bus factor]
+        mostPulls365: MetricDataPartial2.mostPulls365, // most active contributor's pull request count, last 365 days [bus factor]
+        totalPulls365: MetricDataPartial2.totalPulls365, // number of pull requests, last 365 days [bus factor]
+        issuesClosed: MetricDataPartial1.issuesClosed, // number of closed issues [correctness]
+        issuesTotal: MetricDataPartial1.issuesTotal, // total number of issues [correctness]
+        issuesClosed30: MetricDataPartial1.issuesClosed30, // number of closed issues, last 30 days [correctness]
+        issuesTotal30: MetricDataPartial1.issuesTotal30, // total number of issues, last 30 days [correctness]
+        issuesClosed14: MetricDataPartial1.issuesClosed14, // number of closed issues, last 14 days [responsive maintainer]
+        issuesOpen: MetricDataPartial1.issuesOpen, // number of open issues [responsive maintainer]
     };
 
     console.log(exportMetric);
@@ -66,9 +71,15 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
     return exportMetric;
 }
 
-async function fetchIssues(apiLink: string) {
+async function fetchIssues(apiLink: string, MetricDataPartial1) {
 
     //console.log(`Entering fetchIssues function`);
+    let issuesClosed = 0; // number of closed issues [correctness]
+    let issuesTotal = 0; // total number of issues [correctness]
+    let issuesClosed30 = 0; // number of closed issues, last 30 days [correctness]
+    let issuesTotal30 = 0; // total number of issues, last 30 days [correctness]
+    let issuesClosed14 = 0; // number of closed issues, last 14 days [responsive maintainer]
+    let issuesOpen = 0; // number of open issues [responsive maintainer]
 
     let pageNumberIssue = 1; // page number of which the issues are being shown
 
@@ -141,10 +152,18 @@ async function fetchIssues(apiLink: string) {
         }
 
     }
+
+    MetricDataPartial1.issuesClosed = issuesClosed;
+    MetricDataPartial1.issuesTotal = issuesTotal;
+    MetricDataPartial1.issuesClosed30 = issuesClosed30;
+    MetricDataPartial1.issuesTotal30 = issuesTotal30;
+    MetricDataPartial1.issuesClosed14 = issuesClosed14;
+    MetricDataPartial1.issuesOpen = issuesOpen;
+
 }
 
 // Function to fetch pulls
-async function fetchPulls(apiLink: string) {
+async function fetchPulls(apiLink: string, MetricDataPartial2) {
 
     //console.log(`Entering fetchPulls function`);
 
@@ -152,6 +171,10 @@ async function fetchPulls(apiLink: string) {
     let contributors: string[] = []; // contains usernames of different usernames from all pull requests, in the last year
     let highestOccurrence = 0; // contains the highest number of pull requests done by a username
     let highestOccurrenceUsername = ''; // contains the username which did the highest number of pull requests
+
+    let totalPullers365 = 0; // number of active contributors, last 365 days [bus factor]
+    let mostPulls365 = 0; // most active contributor's pull request count, last 365 days [bus factor]
+    let totalPulls365 = 0; // number of pull requests, last 365 days [bus factor]
 
     // starts a while loop which only breaks when all the pull requests have been interated through
     // since it goes through 100 pull requests per iteration, the break condition is if the # of issues in the page < 100
@@ -217,10 +240,9 @@ async function fetchPulls(apiLink: string) {
     totalPullers365 = uniqueUsernames.length;
     mostPulls365 = highestOccurrence;
 
-    /*console.log(`totalPullers365 : ${totalPullers365}`);
-        console.log(`mostPulls365 : ${mostPulls365}`);
-        console.log(`totalPulls365 : ${totalPulls365}`);
-        */
+    MetricDataPartial2.totalPullers365 = totalPullers365;
+    MetricDataPartial2.mostPulls365 = mostPulls365;
+    MetricDataPartial2.totalPulls365 = totalPulls365;
 
 }
 
