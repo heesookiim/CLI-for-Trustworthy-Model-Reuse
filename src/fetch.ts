@@ -7,15 +7,15 @@ dotenv.config();
 const personalAccessToken = process.env.GITHUB_TOKEN; // personalAccessToken stored locally
 
 interface MetricData {
-    totalPullers365?: number; // number of active contributors, last 365 days [bus factor]
-    mostPulls365?: number; // most active contributor's pull request count, last 365 days [bus factor]
-    totalPulls365?: number; // number of pull requests, last 365 days [bus factor]
-    issuesClosed?: number; // number of closed issues [correctness]
-    issuesTotal?: number; // total number of issues [correctness]
-    issuesClosed30?: number; // number of closed issues, last 30 days [correctness]
-    issuesTotal30?: number; // total number of issues, last 30 days [correctness]
-    issuesClosed14?: number; // number of closed issues, last 14 days [responsive maintainer]
-    issuesOpen?: number; // number of open issues [responsive maintainer]
+    totalPullers365: number; // number of active contributors, last 365 days [bus factor]
+    mostPulls365: number; // most active contributor's pull request count, last 365 days [bus factor]
+    totalPulls365: number; // number of pull requests, last 365 days [bus factor]
+    issuesClosed: number; // number of closed issues [correctness]
+    issuesTotal: number; // total number of issues [correctness]
+    issuesClosed30: number; // number of closed issues, last 30 days [correctness]
+    issuesTotal30: number; // total number of issues, last 30 days [correctness]
+    issuesClosed14: number; // number of closed issues, last 14 days [responsive maintainer]
+    issuesOpen: number; // number of open issues [responsive maintainer]
 }
 
 // Creates 3 dates and configures it to be:
@@ -35,7 +35,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
     // format of comments:
     // description, specific-description?  [for-which-metric]
 
-    const MetricDataPartial1: MetricData =  {
+    const MetricDataPartial1 = {
         issuesClosed: 0, // number of closed issues [correctness]
         issuesTotal: 0, // total number of issues [correctness]
         issuesClosed30: 0, // number of closed issues, last 30 days [correctness]
@@ -44,7 +44,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
         issuesOpen: 0, // number of open issues [responsive maintainer]
     };
 
-    const MetricDataPartial2: MetricData =  {
+    const MetricDataPartial2 = {
         totalPullers365: 0, // number of active contributors, last 365 days [bus factor]
         mostPulls365: 0, // most active contributor's pull request count, last 365 days [bus factor]
         totalPulls365: 0, // number of pull requests, last 365 days [bus factor]
