@@ -311,4 +311,4 @@ function convertLink(githubLink: string) {
     return githubApiLink;
 } 
 
-export { fetch_METRICS, getLink, convertLink };
+export { fetch_METRICS, getLink, convertLink, fetchIssues, fetchPulls, linkValidator };
