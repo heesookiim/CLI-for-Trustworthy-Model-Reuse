@@ -128,6 +128,16 @@ export async function GenerateCalculations(currModule: module, npmFlag: boolean)
         logger.log('debug', 'Calculated NET_SCORE: ' + currModule.NET_SCORE);
 
         logger.log('info', 'Completed calculation for module: ' + currModule.URL);
+
+        if (rawData.contrubtorMostPullRequests == -1) {
+            currModule.BUS_FACTOR_SCORE = -1;
+            currModule.CORRECTNESS_SCORE = -1;
+            currModule.RAMP_UP_SCORE = -1;
+            currModule.RESPONSIVE_MAINTAINER_SCORE = -1;
+            currModule.LICENSE_SCORE = -1;
+            currModule.NET_SCORE = -1;
+        }
+        
         GenerateOutput(currModule);
     });
     response.catch((err) => {

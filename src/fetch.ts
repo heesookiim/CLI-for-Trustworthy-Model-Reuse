@@ -50,6 +50,23 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
         totalPulls365: 0, // number of pull requests, last 365 days [bus factor]
     };
 
+    let status: number = await linkValidator(apiLink);
+
+    if (status != 200) {
+        let exportMetric: MetricData = {
+            totalPullers365: -1, // number of active contributors, last 365 days [bus factor]
+            mostPulls365: -1, // most active contributor's pull request count, last 365 days [bus factor]
+            totalPulls365: -1, // number of pull requests, last 365 days [bus factor]
+            issuesClosed: -1, // number of closed issues [correctness]
+            issuesTotal: -1, // total number of issues [correctness]
+            issuesClosed30: -1, // number of closed issues, last 30 days [correctness]
+            issuesTotal30: -1, // total number of issues, last 30 days [correctness]
+            issuesClosed14: -1, // number of closed issues, last 14 days [responsive maintainer]
+            issuesOpen: -1, // number of open issues [responsive maintainer]
+        };
+        return exportMetric;
+    }
+
     // calls the 2 functions
     await fetchIssues(apiLink, MetricDataPartial1);
     await fetchPulls(apiLink, MetricDataPartial2);
@@ -69,6 +86,15 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
     logger.log('debug', 'Metric data:' + exportMetric);
     // export
     return exportMetric;
+}
+
+async function linkValidator(apiLink: string) {
+    try {
+        const response = await axios.get(apiLink);
+        return response.status; // Return the HTTP status code
+    } catch (error) {
+        return 400;
+    }
 }
 
 async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
@@ -94,57 +120,56 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
             },
         });
 
-        if (responseIssue.status == 200) {
+        // the next 6 arrays are created to store specific data from the response
+        // GitHub's REST API considers every pull request an issue, but not every issue is a pull request.
+        // For this reason, "Issues" endpoints may return both issues and pull requests in the response.
 
-            // the next 6 arrays are created to store specific data from the response
-            // GitHub's REST API considers every pull request an issue, but not every issue is a pull request.
-            // For this reason, "Issues" endpoints may return both issues and pull requests in the response.
-
-            const issuesClosed_Array = responseIssue.data // number of closed issues [correctness]
+        const issuesClosed_Array = responseIssue.data // number of closed issues [correctness]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
                 .filter((issue: any) => issue.state == 'closed'); // filtering for only closed issues
 
-            const issuesTotal_Array = responseIssue.data // total number of issues [correctness]
+        const issuesTotal_Array = responseIssue.data // total number of issues [correctness]
                 .filter((issue: any) => !(issue.pull_request)); // making sure the issue is actually an issue, not a pull request
 
-            const issuesClosed30_Array = responseIssue.data // number of closed issues, last 30 days [correctness]
+        const issuesClosed30_Array = responseIssue.data // number of closed issues, last 30 days [correctness]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
                 .filter((issue: any) => issue.state == 'closed') // filtering for only closed issues
                 .filter((issue: any) => new Date(issue.created_at) >= date30); // filtering for only issues in the last month
 
-            const issuesTotal30_Array = responseIssue.data // total number of issues, last 30 days [correctness]
+        const issuesTotal30_Array = responseIssue.data // total number of issues, last 30 days [correctness]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
                 .filter((issue: any) => new Date(issue.created_at) >= date30); // filtering for only issues in the last month
 
-            const issuesClosed14_Array = responseIssue.data // number of closed issues, last 14 days [responsive maintainer]
+        const issuesClosed14_Array = responseIssue.data // number of closed issues, last 14 days [responsive maintainer]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
                 .filter((issue: any) => issue.state == 'closed') // filtering for only closed issues
                 .filter((issue: any) => new Date(issue.created_at) >= date14); // filtering for only issues in the last 2 weeks
 
-            const issuesOpen_Array = responseIssue.data // number of open issues [responsive maintainer]
+        const issuesOpen_Array = responseIssue.data // number of open issues [responsive maintainer]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
                 .filter((issue: any) => issue.state == 'open'); // filtering for only open issues
 
 
-            // adding the counts of each array to it's respective counter
-            issuesClosed += issuesClosed_Array.length;
-            issuesTotal += issuesTotal_Array.length;
-            issuesClosed30 += issuesClosed30_Array.length;
-            issuesTotal30 += issuesTotal30_Array.length;
-            issuesClosed14 += issuesClosed14_Array.length;
-            issuesOpen += issuesOpen_Array.length;
+        // adding the counts of each array to it's respective counter
+        issuesClosed += issuesClosed_Array.length;
+        issuesTotal += issuesTotal_Array.length;
+        issuesClosed30 += issuesClosed30_Array.length;
+        issuesTotal30 += issuesTotal30_Array.length;
+        issuesClosed14 += issuesClosed14_Array.length;
+        issuesOpen += issuesOpen_Array.length;
 
-            // Higher Logging Level
-            logger.log('debug', `Completed Issues: ${issuesTotal}`)
+        // Higher Logging Level
+        logger.log('debug', `Completed Issues: ${issuesTotal}`)
 
-            // break condition to exit the while loop
-            // exits in the first iteration if the issues in the first page are less than ${per_page}
-            if (responseIssue.data.length < 100) {
-                break;
-            }
-            // goes to the next page
-            pageNumberIssue++;
-        } else {
+        // break condition to exit the while loop
+        // exits in the first iteration if the issues in the first page are less than ${per_page}
+        if (responseIssue.data.length < 100) {
+            break;
+        }
+        // goes to the next page
+        pageNumberIssue++;
+
+        if (responseIssue.status != 200) {
             logger.log(`info`, `NO SERVER RESPONSE`);
             break;
         }
@@ -185,31 +210,30 @@ async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
             },
         });
 
-        if (responsePull.status === 200) {
-            // stores specific data from the response, containes the usernames of the pull request makers
-            const usernamesThisFetch = responsePull.data
+        const usernamesThisFetch = responsePull.data
                 .filter((pull_request: any) => new Date(pull_request.created_at) >= date365) // filtering for only issues in the last year
                 .map((pull_request: any) => pull_request.user.login); // mapped by username
 
-            // adds to the total number of pull requests
-            totalPulls365 += usernamesThisFetch.length
+        // adds to the total number of pull requests
+        totalPulls365 += usernamesThisFetch.length
 
-            // puts the usernames into a different array so they are unique
-            usernamesThisFetch.forEach((username: string) => {
-                contributors.push(username);
-            });
+        // puts the usernames into a different array so they are unique
+        usernamesThisFetch.forEach((username: string) => {
+            contributors.push(username);
+        });
 
-            // Higher Logging Level
-            logger.log('debug', `Completed Pull Requests (From Last Year): ${totalPulls365}`)
+        // Higher Logging Level
+        logger.log('debug', `Completed Pull Requests (From Last Year): ${totalPulls365}`)
 
-            // break condition to exit the while loop
-            // exits in the first iteration if the pull requests in the first page are less than ${per_page}
-            if (responsePull.data.length < 100) {
-                break;
-            }
-            // goes to the next page
-            pageNumberPull++;
-        } else {
+        // break condition to exit the while loop
+        // exits in the first iteration if the pull requests in the first page are less than ${per_page}
+        if (responsePull.data.length < 100) {
+            break;
+        }
+        // goes to the next page
+        pageNumberPull++;
+
+        if (responsePull.status != 200) {
             logger.log('info', "No Pull Request Server Response in fetch.ts") // to be removed later
             logger.log(`info`, `NO SERVER RESPONSE`);
             break;
@@ -263,10 +287,11 @@ async function getLink(npmLink: string) {
         }
     } catch (error: any) {
         logger.error('info', `Error: ${error.message}`);
+        return 400;
     }
 
     // Return null if the GitHub link couldn't be retrieved
-    return null;
+    return 400;
 }
 
 function convertLink(githubLink: string) {
