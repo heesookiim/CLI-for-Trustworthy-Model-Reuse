@@ -66,7 +66,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
         issuesOpen: MetricDataPartial1.issuesOpen, // number of open issues [responsive maintainer]
     };
 
-    console.log(exportMetric);
+    logger.log('debug', 'Metric data:' + exportMetric);
     // export
     return exportMetric;
 }
