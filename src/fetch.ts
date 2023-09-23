@@ -71,7 +71,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
     return exportMetric;
 }
 
-async function fetchIssues(apiLink: string, MetricDataPartial1: MetricData) {
+async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
 
     //console.log(`Entering fetchIssues function`);
     let issuesClosed = 0; // number of closed issues [correctness]
@@ -163,7 +163,7 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: MetricData) {
 }
 
 // Function to fetch pulls
-async function fetchPulls(apiLink: string, MetricDataPartial2: MetricData) {
+async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
 
     //console.log(`Entering fetchPulls function`);
 
