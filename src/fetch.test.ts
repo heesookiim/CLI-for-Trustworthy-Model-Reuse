@@ -1,3 +1,12 @@
+
+// test fetch_Metric function to see if calls fetchi
+
+// while loop in fetch.ts line 59 // test while loop
+
+// respose.status === 200 // test if statement 
+
+// test try/catch line 238
+
 import axios from 'axios';
 import { fetch_METRICS, getLink, convertLink } from './fetch';
 
@@ -31,8 +40,8 @@ describe('fetch_METRICS function', () => {
   });
 });
 
-describe('getLink function', () => {
-  it('should extract GitHub repository link from npm package page', async () => {
+// getLink function
+test('should extract GitHub repository link from npm package page', async () => {
     // Mock Axios response with HTML containing GitHub repository link
     axios.get.mockResolvedValue({
       status: 200,
@@ -43,9 +52,9 @@ describe('getLink function', () => {
     const result = await getLink(npmLink);
 
     expect(result).toBe('sample-github-repo-link');
-  });
+});
 
-  it('should return null when GitHub repository link is not found', async () => {
+test('should return null when GitHub repository link is not found', async () => {
     // Mock Axios response with HTML without GitHub repository link
     axios.get.mockResolvedValue({
       status: 200,
@@ -56,9 +65,9 @@ describe('getLink function', () => {
     const result = await getLink(npmLink);
 
     expect(result).toBeNull();
-  });
+});
 
-  it('should handle HTTP errors and return null', async () => {
+test('should handle HTTP errors and return null', async () => {
     // Mock Axios response for HTTP error
     axios.get.mockRejectedValue(new Error('HTTP error'));
 
@@ -66,14 +75,23 @@ describe('getLink function', () => {
     const result = await getLink(npmLink);
 
     expect(result).toBeNull();
-  });
 });
 
-describe('convertLink function', () => {
-  it('should convert a GitHub link to the GitHub API link', () => {
+//convertLink function
+test('should convert a GitHub link to the GitHub API link', () => {
     const githubLink = 'sample-github-link';
     const result = convertLink(githubLink);
 
     expect(result).toBe('https://api.github.com/repos/sample-owner/sample-repo');
-  });
+});
+
+test('getLink should handle errors gracefully', async () => {
+    // Mock the Axios.get function to simulate an error (e.g., network error)
+    (axios.get as jest.MockedFunction<typeof axios.get>).mockRejectedValue(new Error('Network error'));
+  
+    // Call the getLink function
+    const result = await getLink('some-npm-link');
+  
+    // Assert that the function gracefully handles the error
+    expect(result).toBeNull();
 });
