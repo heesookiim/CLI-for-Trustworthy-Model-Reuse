@@ -130,7 +130,7 @@ async function fetchIssues(apiLink: string, MetricDataPartial1) {
             issuesClosed += issuesClosed_Array.length;
             issuesTotal += issuesTotal_Array.length;
             issuesClosed30 += issuesClosed30_Array.length;
-            issuesTotal30 += issuesClosed30_Array.length;
+            issuesTotal30 += issuesTotal30.length;
             issuesClosed14 += issuesClosed14_Array.length;
             issuesOpen += issuesOpen_Array.length;
 
