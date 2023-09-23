@@ -45,194 +45,182 @@ date365.setDate(date365.getDate() - 365); // (Today - 365 Days) ~ 1 year
 // Returns an interface of type MetricData,
 async function fetch_METRICS(apiLink: string): Promise<MetricData> {
 
-    //console.log(`Entering fetch_METRICS function`);
+    // calls the 2 functions
+    await fetchIssues(apiLink);
+    await fetchPulls(apiLink);
 
-    // Function to fetch issues
-    async function fetchIssues() {
+    let exportMetric: MetricData = {
+        totalPullers365: totalPullers365, // number of active contributors, last 365 days [bus factor]
+        mostPulls365: mostPulls365, // most active contributor's pull request count, last 365 days [bus factor]
+        totalPulls365: totalPulls365, // number of pull requests, last 365 days [bus factor]
+        issuesClosed: issuesClosed, // number of closed issues [correctness]
+        issuesTotal: issuesTotal, // total number of issues [correctness]
+        issuesClosed30: issuesClosed30, // number of closed issues, last 30 days [correctness]
+        issuesTotal30: issuesTotal30, // total number of issues, last 30 days [correctness]
+        issuesClosed14: issuesClosed14, // number of closed issues, last 14 days [responsive maintainer]
+        issuesOpen: issuesOpen, // number of open issues [responsive maintainer]
+    };
 
-        //console.log(`Entering fetchIssues function`);
+    console.log(exportMetric);
+    // export
+    return exportMetric;
+}
 
-        let pageNumberIssue = 1; // page number of which the issues are being shown
+async function fetchIssues(apiLink: string) {
 
-        // starts a while loop which only breaks when all the issues have been interated through
-        // since it goes through 100 issues per iteration, the break condition is if the # of issues in the page < 100
-        while (true) {
+    //console.log(`Entering fetchIssues function`);
 
-            // fetches the data of 100 pages of page ${pageNumberIssue}
-            const responseIssue = await axios.get(`${apiLink}/issues?state=all&page=${pageNumberIssue}&per_page=100`, {
-                headers: {
-                    Authorization: `token ${personalAccessToken}`,
-                },
-            });
+    let pageNumberIssue = 1; // page number of which the issues are being shown
 
-            if (responseIssue.status == 200) {
+    // starts a while loop which only breaks when all the issues have been interated through
+    // since it goes through 100 issues per iteration, the break condition is if the # of issues in the page < 100
+    while (true) {
 
-                // the next 6 arrays are created to store specific data from the response
-                // GitHub's REST API considers every pull request an issue, but not every issue is a pull request.
-                // For this reason, "Issues" endpoints may return both issues and pull requests in the response.
+        // fetches the data of 100 pages of page ${pageNumberIssue}
+        const responseIssue = await axios.get(`${apiLink}/issues?state=all&page=${pageNumberIssue}&per_page=100`, {
+            headers: {
+                Authorization: `token ${personalAccessToken}`,
+            },
+        });
 
-                const issuesClosed_Array = responseIssue.data // number of closed issues [correctness]
+        if (responseIssue.status == 200) {
+
+            // the next 6 arrays are created to store specific data from the response
+            // GitHub's REST API considers every pull request an issue, but not every issue is a pull request.
+            // For this reason, "Issues" endpoints may return both issues and pull requests in the response.
+
+            const issuesClosed_Array = responseIssue.data // number of closed issues [correctness]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
                 .filter((issue: any) => issue.state == 'closed'); // filtering for only closed issues
 
-                const issuesTotal_Array = responseIssue.data // total number of issues [correctness]
+            const issuesTotal_Array = responseIssue.data // total number of issues [correctness]
                 .filter((issue: any) => !(issue.pull_request)); // making sure the issue is actually an issue, not a pull request
 
-                const issuesClosed30_Array = responseIssue.data // number of closed issues, last 30 days [correctness]
+            const issuesClosed30_Array = responseIssue.data // number of closed issues, last 30 days [correctness]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
                 .filter((issue: any) => issue.state == 'closed') // filtering for only closed issues
                 .filter((issue: any) => new Date(issue.created_at) >= date30); // filtering for only issues in the last month
 
-                const issuesTotal30_Array = responseIssue.data // total number of issues, last 30 days [correctness]
+            const issuesTotal30_Array = responseIssue.data // total number of issues, last 30 days [correctness]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
                 .filter((issue: any) => new Date(issue.created_at) >= date30); // filtering for only issues in the last month
 
-                const issuesClosed14_Array = responseIssue.data // number of closed issues, last 14 days [responsive maintainer]
+            const issuesClosed14_Array = responseIssue.data // number of closed issues, last 14 days [responsive maintainer]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
                 .filter((issue: any) => issue.state == 'closed') // filtering for only closed issues
                 .filter((issue: any) => new Date(issue.created_at) >= date14); // filtering for only issues in the last 2 weeks
 
-                const issuesOpen_Array = responseIssue.data // number of open issues [responsive maintainer]
+            const issuesOpen_Array = responseIssue.data // number of open issues [responsive maintainer]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
                 .filter((issue: any) => issue.state == 'open'); // filtering for only open issues
 
 
-                // adding the counts of each array to it's respective counter
-                issuesClosed += issuesClosed_Array.length;
-                issuesTotal += issuesTotal_Array.length;
-                issuesClosed30 += issuesClosed30_Array.length;
-                issuesTotal30 += issuesClosed30_Array.length;
-                issuesClosed14 += issuesClosed14_Array.length;
-                issuesOpen += issuesOpen_Array.length;
+            // adding the counts of each array to it's respective counter
+            issuesClosed += issuesClosed_Array.length;
+            issuesTotal += issuesTotal_Array.length;
+            issuesClosed30 += issuesClosed30_Array.length;
+            issuesTotal30 += issuesClosed30_Array.length;
+            issuesClosed14 += issuesClosed14_Array.length;
+            issuesOpen += issuesOpen_Array.length;
 
-                // Higher Logging Level
-                // console.log(`Completed Issues: ${issuesTotal}`)
+            // Higher Logging Level
+            // console.log(`Completed Issues: ${issuesTotal}`)
 
-                // break condition to exit the while loop
-                // exits in the first iteration if the issues in the first page are less than ${per_page}
-                if (responseIssue.data.length < 100) {
-                    break;
-                }
-                // goes to the next page
-                pageNumberIssue++;
-            } else {
-                //console.log("No Issue Server Response in fetch.ts") // to be removed later
-                //logger.log(`info`, `NO SERVER RESPONSE`);
-                console.log(`Incorrect Behaviour`);
+            // break condition to exit the while loop
+            // exits in the first iteration if the issues in the first page are less than ${per_page}
+            if (responseIssue.data.length < 100) {
                 break;
             }
-
+            // goes to the next page
+            pageNumberIssue++;
+        } else {
+            //console.log("No Issue Server Response in fetch.ts") // to be removed later
+            //logger.log(`info`, `NO SERVER RESPONSE`);
+            console.log(`Incorrect Behaviour`);
+            break;
         }
-        /*console.log(`Fetches all issues!`);
-        console.log(`issuesClosed : ${issuesClosed}`);
-        console.log(`issuesTotal : ${issuesTotal}`);
-        console.log(`issuesClosed30 : ${issuesClosed30}`);
-        console.log(`issuesTotal30 : ${issuesTotal30}`);
-        console.log(`issuesClosed14 : ${issuesClosed14}`);
-        console.log(`issuesOpen : ${issuesOpen}`);
-        */
-
-        let exportMetric: MetricData = {
-            totalPullers365: totalPullers365, // number of active contributors, last 365 days [bus factor]
-            mostPulls365: mostPulls365, // most active contributor's pull request count, last 365 days [bus factor]
-            totalPulls365: totalPulls365, // number of pull requests, last 365 days [bus factor]
-            issuesClosed: issuesClosed, // number of closed issues [correctness]
-            issuesTotal: issuesTotal, // total number of issues [correctness]
-            issuesClosed30: issuesClosed30, // number of closed issues, last 30 days [correctness]
-            issuesTotal30: issuesTotal30, // total number of issues, last 30 days [correctness]
-            issuesClosed14: issuesClosed14, // number of closed issues, last 14 days [responsive maintainer]
-            issuesOpen: issuesOpen, // number of open issues [responsive maintainer]
-        };
-        console.log(exportMetric);
-        // export
-        return exportMetric;
 
     }
+}
 
-    // Function to fetch pulls
-    async function fetchPulls() {
+// Function to fetch pulls
+async function fetchPulls(apiLink: string) {
 
-        //console.log(`Entering fetchPulls function`);
+    //console.log(`Entering fetchPulls function`);
 
-        let pageNumberPull = 1; // page number of which the pulls are being shown
-        let contributors: string[] = []; // contains usernames of different usernames from all pull requests, in the last year
-        let highestOccurrence = 0; // contains the highest number of pull requests done by a username
-        let highestOccurrenceUsername = ''; // contains the username which did the highest number of pull requests
+    let pageNumberPull = 1; // page number of which the pulls are being shown
+    let contributors: string[] = []; // contains usernames of different usernames from all pull requests, in the last year
+    let highestOccurrence = 0; // contains the highest number of pull requests done by a username
+    let highestOccurrenceUsername = ''; // contains the username which did the highest number of pull requests
 
-        // starts a while loop which only breaks when all the pull requests have been interated through
-        // since it goes through 100 pull requests per iteration, the break condition is if the # of issues in the page < 100
-        while (true) {
+    // starts a while loop which only breaks when all the pull requests have been interated through
+    // since it goes through 100 pull requests per iteration, the break condition is if the # of issues in the page < 100
+    while (true) {
 
-            // fetches the data of 100 pages of page ${pageNumberPull}
-            const responsePull = await axios.get(`${apiLink}/pulls?page=${pageNumberPull}&per_page=100`, {
-                headers: {
-                    Authorization: `token ${personalAccessToken}`,
-                },
-            });
+        // fetches the data of 100 pages of page ${pageNumberPull}
+        const responsePull = await axios.get(`${apiLink}/pulls?page=${pageNumberPull}&per_page=100`, {
+            headers: {
+                Authorization: `token ${personalAccessToken}`,
+            },
+        });
 
-            if (responsePull.status === 200) {
-                // stores specific data from the response, containes the usernames of the pull request makers
-                const usernamesThisFetch = responsePull.data
+        if (responsePull.status === 200) {
+            // stores specific data from the response, containes the usernames of the pull request makers
+            const usernamesThisFetch = responsePull.data
                 .filter((pull_request: any) => new Date(pull_request.created_at) >= date365) // filtering for only issues in the last year
                 .map((pull_request: any) => pull_request.user.login); // mapped by username
 
-                // adds to the total number of pull requests
-                totalPulls365 += usernamesThisFetch.length
+            // adds to the total number of pull requests
+            totalPulls365 += usernamesThisFetch.length
 
-                // puts the usernames into a different array so they are unique
-                usernamesThisFetch.forEach((username: string) => {
-                    contributors.push(username);
-                });
+            // puts the usernames into a different array so they are unique
+            usernamesThisFetch.forEach((username: string) => {
+                contributors.push(username);
+            });
 
-                // Higher Logging Level
-                // console.log(`Completed Pull Requests (From Last Year): ${totalPulls365}`)
+            // Higher Logging Level
+            // console.log(`Completed Pull Requests (From Last Year): ${totalPulls365}`)
 
-                // break condition to exit the while loop
-                // exits in the first iteration if the pull requests in the first page are less than ${per_page}
-                if (responsePull.data.length < 100) {
-                    break;
-                }
-                // goes to the next page
-                pageNumberPull++;
-            } else {
-                //console.log("No Pull Request Server Response in fetch.ts") // to be removed later
-                logger.log(`info`, `NO SERVER RESPONSE`);
+            // break condition to exit the while loop
+            // exits in the first iteration if the pull requests in the first page are less than ${per_page}
+            if (responsePull.data.length < 100) {
                 break;
             }
+            // goes to the next page
+            pageNumberPull++;
+        } else {
+            //console.log("No Pull Request Server Response in fetch.ts") // to be removed later
+            logger.log(`info`, `NO SERVER RESPONSE`);
+            break;
         }
+    }
 
-        // attaches a number to each username which contains the number of times they had pull requests
-        const usernameCounts: { [username: string]: number } = {};
-        contributors.forEach((username) => {
-            if (usernameCounts[username]) {
-                usernameCounts[username]++;
-            } else {
-                usernameCounts[username] = 1;
-            }
-        });
+    // attaches a number to each username which contains the number of times they had pull requests
+    const usernameCounts: { [username: string]: number } = {};
+    contributors.forEach((username) => {
+        if (usernameCounts[username]) {
+            usernameCounts[username]++;
+        } else {
+            usernameCounts[username] = 1;
+        }
+    });
 
-        // finds the username with the highest number of pull requests
-        const uniqueUsernames = Object.keys(usernameCounts);
-        uniqueUsernames.forEach((username) => {
-            if (usernameCounts[username] > highestOccurrence) {
-                highestOccurrence = usernameCounts[username];
-                highestOccurrenceUsername = username;
-            }
-        });
-        
-        totalPullers365 = uniqueUsernames.length;
-        mostPulls365 = highestOccurrence;
+    // finds the username with the highest number of pull requests
+    const uniqueUsernames = Object.keys(usernameCounts);
+    uniqueUsernames.forEach((username) => {
+        if (usernameCounts[username] > highestOccurrence) {
+            highestOccurrence = usernameCounts[username];
+            highestOccurrenceUsername = username;
+        }
+    });
 
-        /*console.log(`totalPullers365 : ${totalPullers365}`);
+    totalPullers365 = uniqueUsernames.length;
+    mostPulls365 = highestOccurrence;
+
+    /*console.log(`totalPullers365 : ${totalPullers365}`);
         console.log(`mostPulls365 : ${mostPulls365}`);
         console.log(`totalPulls365 : ${totalPulls365}`);
         */
-
-    }
-
-    // calls the 2 functions
-    fetchPulls();
-    fetchIssues();
 
 }
 
