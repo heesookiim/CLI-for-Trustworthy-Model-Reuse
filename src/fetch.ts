@@ -22,8 +22,10 @@ interface MetricData {
 const date14 = new Date();
 const date30 = new Date();
 const date365 = new Date();
+const date180 = new Date();
 date14.setDate(date14.getDate() - 14); // (Today - 14 Days) ~ 2 weeks
 date30.setDate(date30.getDate() - 30); // (Today - 30 Days) ~ 1 month
+date365.setDate(date365.getDate() - 180); // (Today - 365 Days) ~ 1 year
 date365.setDate(date365.getDate() - 365); // (Today - 365 Days) ~ 1 year
 
 // Fetches all the metrics from the GitHub API
@@ -120,11 +122,11 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
             },
         });
         
-        if (responseIssue.status != 200) {
-            logger.log('info', "No Issue Server Response in fetch.ts") // to be removed later
-            logger.log(`info`, `NO SERVER RESPONSE`);
-            break;
-        }
+//        if (responseIssue.status != 200) {
+//            logger.log('info', "No Issue Server Response in fetch.ts") // to be removed later
+//            logger.log(`info`, `NO SERVER RESPONSE`);
+//            break;
+//        }
 
         // the next 6 arrays are created to store specific data from the response
         // GitHub's REST API considers every pull request an issue, but not every issue is a pull request.
@@ -132,10 +134,12 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
 
         const issuesClosed_Array = responseIssue.data // number of closed issues [correctness]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
-                .filter((issue: any) => issue.state == 'closed'); // filtering for only closed issues
+                .filter((issue: any) => issue.state == 'closed') // filtering for only closed issues
+                .filter((issue: any) => new Date(issue.created_at) >= date180); // filtering for only issues in the last 6 months
 
         const issuesTotal_Array = responseIssue.data // total number of issues [correctness]
-                .filter((issue: any) => !(issue.pull_request)); // making sure the issue is actually an issue, not a pull request
+                .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
+                .filter((issue: any) => new Date(issue.created_at) >= date180); // filtering for only issues in the last 6 months
 
         const issuesClosed30_Array = responseIssue.data // number of closed issues, last 30 days [correctness]
                 .filter((issue: any) => !(issue.pull_request)) // making sure the issue is actually an issue, not a pull request
@@ -211,11 +215,11 @@ async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
             },
         });
         
-        if (responsePull.status != 200) {
-            logger.log('info', "No Pull Request Server Response in fetch.ts") // to be removed later
-            logger.log(`info`, `NO SERVER RESPONSE`);
-            break;
-        }
+//        if (responsePull.status != 200) {
+//            logger.log('info', "No Pull Request Server Response in fetch.ts") // to be removed later
+//            logger.log(`info`, `NO SERVER RESPONSE`);
+//            break;
+//        }
 
         const usernamesThisFetch = responsePull.data
                 .filter((pull_request: any) => new Date(pull_request.created_at) >= date365) // filtering for only issues in the last year
