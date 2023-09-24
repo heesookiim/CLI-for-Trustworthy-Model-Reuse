@@ -14,7 +14,8 @@ try {
         // parse data and generate output
         const parsedTest = JSON.parse(test);
         const parsedCoverage = JSON.parse(coverage);
-        process.stdout.write(`${parsedTest.numPassedTests}/${parsedTest.numTotalTests} test cases passed. ${parsedCoverage.total.lines.pct}% line coverage achieved.`);
+        let lineCoverage: number = (parsedCoverage.total.lines.pct).toFixed(0);
+        process.stdout.write(`${parsedTest.numPassedTests}/${parsedTest.numTotalTests} test cases passed. ${lineCoverage}% line coverage achieved.`);
         
         logger.log('debug', `${parsedTest.numPassedTests}/${parsedTest.numTotalTests} test cases passed.`);
         logger.log('debug', `${parsedCoverage.total.lines.pct}% line coverage achieved.`);
