@@ -14,7 +14,7 @@ export async function API(link: string, npmFlag: boolean): Promise<data> {
 
     let rawData: data = {contrubtorMostPullRequests: 0, totalPullRequests: 0, activeContributors: 0,
         totalClosedIssues: 0, totalissues: 0, totalClosedIssuesMonth: 0, totalIssuesMonth: 0,
-        quickStart: 0, examples: 0, usage: 0, closedIssues: 0, openIssues: 0, licenses: []};
+        quickStart: 0, examples: 0, usage: 0, closedIssues: 0, openIssues: 0, license: ''};
     
     // Link for any repo
     const userData = await fetch_METRICS(githubApiLink);
@@ -25,6 +25,7 @@ export async function API(link: string, npmFlag: boolean): Promise<data> {
         rawData.quickStart = response[0];
         rawData.examples = response[1];
         rawData.usage = response[2];
+        rawData.license = response[3];
     } else {
         logger.log('info', 'Failed to fetch readme data');
     }

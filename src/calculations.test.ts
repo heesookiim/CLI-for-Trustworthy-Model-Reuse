@@ -16,7 +16,7 @@ test('BusFactor0', () => {
         usage: 1,
         closedIssues: 5,
         openIssues: 10,
-        licenses: ['License1'],
+        license: 'License1',
     };
 
     const result = BusFactor(rawData);
@@ -39,7 +39,7 @@ test('BusFactorSuccess', () => {
         usage: 1,
         closedIssues: 5,
         openIssues: 10,
-        licenses: ['License1'],      
+        license: 'License1',      
     };
 
     const result = BusFactor(rawData);
@@ -62,7 +62,7 @@ test('Correctness0', () => {
         usage: 1,
         closedIssues: 5,
         openIssues: 10,
-        licenses: ['License1'],      
+        license: 'License1',      
     };
 
     const result = Correctness(rawData);
@@ -85,7 +85,7 @@ test('CorrectnessSuccess', () => {
         usage: 1,
         closedIssues: 5,
         openIssues: 10,
-        licenses: ['License1'],      
+        license: 'License1',      
     };
 
     const result = Correctness(rawData);
@@ -108,7 +108,7 @@ test('RampUp', () => {
         usage: 1,
         closedIssues: 5,
         openIssues: 10,
-        licenses: ['License1'],
+        license: 'License1',
     };
 
     const result = RampUp(rawData);
@@ -131,7 +131,7 @@ test('ResponsiveMaintainer0', () => {
         usage: 1,
         closedIssues: 5,
         openIssues: 0,
-        licenses: ['License1'],
+        license: 'License1',
     };
 
     const result = ResponsiveMaintainer(rawData);
@@ -153,7 +153,7 @@ test('ResponsiveMaintainerSuccess', () => {
         usage: 1,
         closedIssues: 5,
         openIssues: 10,
-        licenses: ['License1'],      
+        license: 'License1',      
     };
 
     const result = ResponsiveMaintainer(rawData);
@@ -161,7 +161,7 @@ test('ResponsiveMaintainerSuccess', () => {
     expect(result).toBe(0.5);
 });
   
-// should return 1 if all licenses are "GNU Lesser General Public License, version 2.1
+// should return 1 if all license are "GNU Lesser General Public License, version 2.1
 test('License1', () => {
     const rawData: data = {
             contrubtorMostPullRequests: 10,
@@ -176,8 +176,7 @@ test('License1', () => {
             usage: 1,
             closedIssues: 5,
             openIssues: 10,
-            licenses: ['GNU Lesser General Public License, version 2.1', 
-                        'GNU Lesser General Public License, version 2.1'],
+            license: 'GNU Lesser General Public License, version 2.1',
     };
 
     const result = License(rawData);
@@ -185,7 +184,7 @@ test('License1', () => {
     expect(result).toBe(1);
 });
   
-//should return 0 if all licenses are "GNU Lesser General Public License, version 2.1
+//should return 0 if all license are "GNU Lesser General Public License, version 2.1
 test('License0', () => {
     const rawData: data = {
         contrubtorMostPullRequests: 10,
@@ -200,7 +199,7 @@ test('License0', () => {
         usage: 1,
         closedIssues: 5,
         openIssues: 10,
-        licenses: ['GNU Lesser General Public License, version 2.1', 'MIT License', 'License3'],
+        license: '',
     };
 
     const result = License(rawData);

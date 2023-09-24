@@ -5,7 +5,7 @@ import { logger } from './logging_cfg';
 
 //const githubRepoUrl = 'https://github.com/lodash/lodash'; // Replace with the actual GitHub repository URL
 
-export async function ReadMeExtractor(githubRepoUrl: string): Promise<number[]> {
+export async function ReadMeExtractor(githubRepoUrl: string): Promise<[number, number, number, string]> {
   const localRepoPath = './local-repo'; // Specify the path where you want to clone the repository
   try {
     // Check if the local directory exists already
@@ -36,26 +36,24 @@ export async function ReadMeExtractor(githubRepoUrl: string): Promise<number[]> 
     const readmePath = `${localRepoPath}/README.md`; // Update the filename if it's different
     const readmeContent = fs.readFileSync(readmePath, 'utf-8');
 
-    // Log the entire README content
-    // logger.log('debug', 'README Content:');
-    // logger.log('debug', readmeContent);
-
     // Extract information
     const quickStartFound: number = checkQuickStart(readmeContent);
     const examplesFound: number = checkExamples(readmeContent);
     const usageFound: number = checkUsage(readmeContent);
+    const license: string = checkLicense(readmeContent);
 
     logger.log('info', 'Readme data gathered for ' + githubRepoUrl);
     logger.log('debug', 'Quick Start: ' + quickStartFound);
     logger.log('debug', 'Examples: ' + examplesFound);
     logger.log('debug', 'Usage' + usageFound);
+    logger.log('debug', 'License' + license);
     deletePath(localRepoPath);
-    return [quickStartFound, examplesFound, usageFound];
+    return [quickStartFound, examplesFound, usageFound, license];
 
   } catch (error) {
     logger.log('info', 'An error occurred:' + error);
     deletePath(localRepoPath);
-    return [0, 0, 0];
+    return [0, 0, 0, ''];
   }
 }
 
@@ -118,4 +116,25 @@ function checkUsage(content: string): number {
     }
     
     return 0;
+}
+
+function checkLicense(content: string): string {
+  // check license compatibility
+  // reference: https://www.gnu.org/licenses/license-list.en.html#GPLCompatibleLicenses
+  const licenseDetection1 = /(MIT|Apache|Artistic|Berkely Database|Boost Software|BSD|CeCILL version 2|Cryptix General)[\w\s]*License/i;
+  const licenseDetection2 = /(Eiffel|EU DataGrid|Expat|Freetype|Intel open source|ISC|Mozilla|SGI Free|ML of New Jersey)[\w\s]*License/i;
+  const licenseDetection3 = /(Unicode|Universal|W3C|X11|XFree|Zope Public|eCos|Educational|NCSA|OpenLDAP)[\w\s]*License/i;
+  const licenseFound1 = content.match(licenseDetection1);
+  const licenseFound2 = content.match(licenseDetection2);
+  const licenseFound3 = content.match(licenseDetection3);
+
+  if (licenseFound1) {
+    return licenseFound1[0];
+  } else if(licenseFound2) {
+    return licenseFound2[0];
+  } else if(licenseFound3) {
+    return licenseFound3[0];
+  } else {
+    return '';
+  }
 }

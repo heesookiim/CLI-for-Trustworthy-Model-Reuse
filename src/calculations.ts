@@ -16,7 +16,7 @@ export type data = {
     usage: number,                       // existance of usage section in README (0 for doesn't exist, 1 for exists)
     closedIssues: number,               // number of closed issues in past 2 weeks, number
     openIssues: number,                 // number of open issues, number
-    licenses: string[],                 // string of licenses for module and dependencies
+    license: string,                 // string of licenses for module and dependencies
 }
 
 // bus factor caclulation
@@ -85,20 +85,12 @@ export function ResponsiveMaintainer(rawData: data): number {
 // output: number from license calculation [0, 1]
 export function License(rawData: data): number {
     logger.log('info', 'Calculating License');
-    // license couldn't be found
-    if(rawData.licenses.length == 0) {
+    // check license
+    if(rawData.license != '') {
+        return 1;
+    } else {
         return 0;
     }
-
-    let compliant: number = 1;  // compliance of license
-    // check each license
-    for(let idx: number = 0; idx < (rawData.licenses).length; idx++) {
-        if ((rawData.licenses)[idx] != 'GNU Lesser General Public License, version 2.1') {
-            compliant = 0;
-        }
-    }
-
-    return compliant;
 }
 
 // net score calculation
