@@ -11,7 +11,7 @@ test('should extract the readme and then output array correctly', async () => {
 
     expect(result).toStrictEqual([1, 1, 1, "MIT"]);
  
-});
+}, 10000);
 
 test('should extract the readme and then output array correctly', async () => {
     const gitHubLink = 'https://github.com/bhatnag8/Radiant';
