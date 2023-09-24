@@ -52,7 +52,7 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
         totalPulls365: 0, // number of pull requests, last 365 days [bus factor]
     };
 
-    let status: number = await linkValidator(apiLink);
+    let status: number | undefined = await linkValidator(apiLink);
 
     if (status != 200) {
         let exportMetric: MetricData = {
