@@ -69,25 +69,33 @@ then
 # check if input is test
 elif [ "$1" = "test" ]
 then
-    # make sure files are compiled
-    COMPILE=$(tsc main.ts 2>&1 > '/dev/null')
-    # run test suite for coverage and number of tests passed 
-    TEST1=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 > '/dev/null')
-    TEST2=$(npx jest --json >> tests.json 2> '/dev/null')
-
-    # generate proper output
-    TSCTEST=$(tsc testParse.ts 2>&1 > '/dev/null');
-    if [[ "${TSCTEST}" != '' ]]; then
-        echo "Files failed to compile"
+    if [[ "${LOG_FILE}" == '' ]]; then
+        echo "LOG_FILE not set"
+        exit 1
+    elif [[ "${GITHUB_TOKEN}" == '' ]]; then
+        echo "GITHUB_TOKEN not set"
         exit 1
     else
-        TESTPARSE=$(node testParse.js);
-        if [[ "${TESTPARSE}" == 'Test suite was not executed' ]]; then
-            echo $TESTPARSE
+        # make sure files are compiled
+        COMPILE=$(tsc main.ts 2>&1 > '/dev/null')
+        # run test suite for coverage and number of tests passed 
+        TEST1=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 > '/dev/null')
+        TEST2=$(npx jest --json >> tests.json 2> '/dev/null')
+
+        # generate proper output
+        TSCTEST=$(tsc testParse.ts 2>&1 > '/dev/null');
+        if [[ "${TSCTEST}" != '' ]]; then
+            echo "Files failed to compile"
             exit 1
         else
-            echo $TESTPARSE
-            exit 0
+            TESTPARSE=$(node testParse.js);
+            if [[ "${TESTPARSE}" == 'Test suite was not executed' ]]; then
+                echo $TESTPARSE
+                exit 1
+            else
+                echo $TESTPARSE
+                exit 0
+            fi
         fi
     fi
 
