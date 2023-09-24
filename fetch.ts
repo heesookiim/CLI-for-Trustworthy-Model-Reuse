@@ -292,7 +292,7 @@ async function getLink(npmLink: string) {
             }
         }
     } catch (error: any) {
-        logger.error('info', `Error: ${error.message}`);
+        logger.log('info', `Error: ${error.message}`);
         return 400;
     }
 
