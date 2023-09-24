@@ -92,11 +92,16 @@ async function fetch_METRICS(apiLink: string): Promise<MetricData> {
 
 async function linkValidator(apiLink: string) {
     try {
+        // Fetch the content of the api package page
         const response = await axios.get(apiLink);
-        return response.status; // Return the HTTP status code
-    } catch (error) {
+        if (response.status == 200) {
+            return 200;
+        }
+    } catch (error: any) {
+        logger.log('info', `Error: ${error.message}`);
         return 400;
     }
+
 }
 
 async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
@@ -121,12 +126,6 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
                 Authorization: `token ${personalAccessToken}`,
             },
         });
-        
-//        if (responseIssue.status != 200) {
-//            logger.log('info', "No Issue Server Response in fetch.ts") // to be removed later
-//            logger.log(`info`, `NO SERVER RESPONSE`);
-//            break;
-//        }
 
         // the next 6 arrays are created to store specific data from the response
         // GitHub's REST API considers every pull request an issue, but not every issue is a pull request.
@@ -215,12 +214,6 @@ async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
             },
         });
         
-//        if (responsePull.status != 200) {
-//            logger.log('info', "No Pull Request Server Response in fetch.ts") // to be removed later
-//            logger.log(`info`, `NO SERVER RESPONSE`);
-//            break;
-//        }
-
         const usernamesThisFetch = responsePull.data
                 .filter((pull_request: any) => new Date(pull_request.created_at) >= date365) // filtering for only issues in the last year
                 .map((pull_request: any) => pull_request.user.login); // mapped by username
@@ -278,8 +271,7 @@ async function getLink(npmLink: string) {
     try {
         // Fetch the content of the npm package page
         const response = await axios.get(npmLink);
-
-        if (response.status === 200) {
+        if (response.status == 200) {
             const html = response.data;
 
             // Use regular expression to find the GitHub repository link
@@ -293,11 +285,11 @@ async function getLink(npmLink: string) {
         }
     } catch (error: any) {
         logger.log('info', `Error: ${error.message}`);
-        return 400;
+        return null;
     }
 
     // Return null if the GitHub link couldn't be retrieved
-    return 400;
+    return null;
 }
 
 function convertLink(githubLink: string) {
