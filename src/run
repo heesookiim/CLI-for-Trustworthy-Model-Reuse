@@ -61,13 +61,8 @@ then
             echo "GITHUB_TOKEN not set"
             exit 1
         else
-            MAIN=$(node main.js $1);
-            if [[ "${MAIN}" == '' ]]; then
-                exit 1
-            else
-                echo $MAIN
-                exit 0
-            fi
+            node main.js $1
+            exit $?
         fi
     fi
 
