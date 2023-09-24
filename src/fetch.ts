@@ -123,18 +123,6 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
         if (responseIssue.status != 200) {
             logger.log('info', "No Issue Server Response in fetch.ts") // to be removed later
             logger.log(`info`, `NO SERVER RESPONSE`);
-            let exportMetric: MetricData = {
-                totalPullers365: -1, // number of active contributors, last 365 days [bus factor]
-                mostPulls365: -1, // most active contributor's pull request count, last 365 days [bus factor]
-                totalPulls365: -1, // number of pull requests, last 365 days [bus factor]
-                issuesClosed: -1, // number of closed issues [correctness]
-                issuesTotal: -1, // total number of issues [correctness]
-                issuesClosed30: -1, // number of closed issues, last 30 days [correctness]
-                issuesTotal30: -1, // total number of issues, last 30 days [correctness]
-                issuesClosed14: -1, // number of closed issues, last 14 days [responsive maintainer]
-                issuesOpen: -1, // number of open issues [responsive maintainer]
-            };
-            return exportMetric;
             break;
         }
 
@@ -187,8 +175,6 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
         // goes to the next page
         pageNumberIssue++;
 
-        
-
     }
 
     MetricDataPartial1.issuesClosed = issuesClosed;
@@ -228,18 +214,6 @@ async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
         if (responsePull.status != 200) {
             logger.log('info', "No Pull Request Server Response in fetch.ts") // to be removed later
             logger.log(`info`, `NO SERVER RESPONSE`);
-            let exportMetric: MetricData = {
-                totalPullers365: -1, // number of active contributors, last 365 days [bus factor]
-                mostPulls365: -1, // most active contributor's pull request count, last 365 days [bus factor]
-                totalPulls365: -1, // number of pull requests, last 365 days [bus factor]
-                issuesClosed: -1, // number of closed issues [correctness]
-                issuesTotal: -1, // total number of issues [correctness]
-                issuesClosed30: -1, // number of closed issues, last 30 days [correctness]
-                issuesTotal30: -1, // total number of issues, last 30 days [correctness]
-                issuesClosed14: -1, // number of closed issues, last 14 days [responsive maintainer]
-                issuesOpen: -1, // number of open issues [responsive maintainer]
-            };
-            return exportMetric;
             break;
         }
 
@@ -265,7 +239,6 @@ async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
         }
         // goes to the next page
         pageNumberPull++;
-
         
     }
 
