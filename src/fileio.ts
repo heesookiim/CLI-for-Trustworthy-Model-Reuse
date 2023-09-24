@@ -60,7 +60,7 @@ function FindNPMModules(URLsList: string[]): module[] {
         if(URLsList[idx].includes("npmjs.com/")) {
             let newModule: module = {URL: URLsList[idx], NET_SCORE: 0, RAMP_UP_SCORE: 0, CORRECTNESS_SCORE: 0,
                                      BUS_FACTOR_SCORE: 0, RESPONSIVE_MAINTAINER_SCORE: 0, LICENSE_SCORE: 0};
-            logger.log('debug', '\nURL: %s\n', URLsList[idx]);
+            logger.log('debug', 'URL: ' + URLsList[idx]);
             moduleList.push(newModule);
         }
     }
