@@ -121,12 +121,6 @@ export function URLFileHandler(file: string) {
     logger.log('info', 'Outputting other links');
     for(let idx: number = 0; idx < otherModuleList.length; idx++) {
         // outputs should all be 0
-        otherModuleList[idx].NET_SCORE = -1;
-        otherModuleList[idx].RAMP_UP_SCORE = -1;
-        otherModuleList[idx].CORRECTNESS_SCORE = -1;
-        otherModuleList[idx].BUS_FACTOR_SCORE = -1;
-        otherModuleList[idx].RESPONSIVE_MAINTAINER_SCORE = -1;
-        otherModuleList[idx].LICENSE_SCORE = -1;
         GenerateOutput(otherModuleList[idx]);
     }
 

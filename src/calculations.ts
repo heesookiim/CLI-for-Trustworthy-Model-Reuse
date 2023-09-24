@@ -25,7 +25,7 @@ export type data = {
 export function BusFactor(rawData: data): number {
     logger.log('info', 'Calculating Bus Factor');
     // check inputs for divide by 0
-    if(rawData.totalPullRequests == 0) {
+    if(rawData.totalPullRequests <= 0) {
         logger.log('debug', 'total pull requests 0')
         return 0;
     }
@@ -43,6 +43,8 @@ export function Correctness(rawData: data): number {
     // check inputs for divide by 0
     if(rawData.totalissues == 0 || rawData.totalIssuesMonth == 0) {
         logger.log('debug', 'Total issues or total issues this month 0');
+        return 1;
+    } else if(rawData.totalissues < 0 || rawData.totalIssuesMonth == 0) {
         return 0;
     }
 
@@ -55,6 +57,9 @@ export function Correctness(rawData: data): number {
 // input: raw data from REST API call
 // output: number from ramp up calculation [0, 1]
 export function RampUp(rawData: data): number {
+    if(rawData.quickStart < 0 || rawData.examples < 0 || rawData.usage < 0) {
+        return 0;
+    }
     logger.log('info', 'Calculating Ramp Up');
     return (0.5 * rawData.quickStart) + (0.25 * rawData.examples) + (0.25 * rawData.usage);
 }
@@ -64,9 +69,11 @@ export function RampUp(rawData: data): number {
 // output: number from responsive maintainer calculation [0, 1]
 export function ResponsiveMaintainer(rawData: data): number {
     logger.log('debug', 'Responsive Maintainer');
-    // check inputs for divide by 0
+    // check inputs for divide by 0 or -1
     if(rawData.openIssues == 0) {
         return 1;
+    } else if(rawData.openIssues < 0) {
+        return 0;
     }
 
     let issueRatio = rawData.closedIssues / rawData.openIssues;
@@ -82,6 +89,7 @@ export function License(rawData: data): number {
     if(rawData.licenses.length == 0) {
         return 0;
     }
+
     let compliant: number = 1;  // compliance of license
     // check each license
     for(let idx: number = 0; idx < (rawData.licenses).length; idx++) {
@@ -130,12 +138,12 @@ export async function GenerateCalculations(currModule: module, npmFlag: boolean)
         logger.log('info', 'Completed calculation for module: ' + currModule.URL);
 
         if (rawData.contrubtorMostPullRequests == -1) {
-            currModule.BUS_FACTOR_SCORE = -1;
-            currModule.CORRECTNESS_SCORE = -1;
-            currModule.RAMP_UP_SCORE = -1;
-            currModule.RESPONSIVE_MAINTAINER_SCORE = -1;
-            currModule.LICENSE_SCORE = -1;
-            currModule.NET_SCORE = -1;
+            currModule.BUS_FACTOR_SCORE = 0;
+            currModule.CORRECTNESS_SCORE = 0;
+            currModule.RAMP_UP_SCORE = 0;
+            currModule.RESPONSIVE_MAINTAINER_SCORE = 0;
+            currModule.LICENSE_SCORE = 0;
+            currModule.NET_SCORE = 0;
         }
         
         GenerateOutput(currModule);

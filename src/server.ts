@@ -6,13 +6,10 @@ import { logger } from './logging_cfg'
 
 // If there's a link for a npm package, set the flag to true and add the link
 export async function API(link: string, npmFlag: boolean): Promise<data> {
-    //var npmFlag = true;
-    //link = 'https://www.npmjs.com/package/browserify';
     if (npmFlag) { 
         link = await Promise.resolve(getLink(link));   // Calling the getLink function to get the GitHub API link
     }
 
-    //githubApiLink = 'https://api.github.com/repos/facebook/react';
     const githubApiLink: string = convertLink(link);
 
     let rawData: data = {contrubtorMostPullRequests: 0, totalPullRequests: 0, activeContributors: 0,
