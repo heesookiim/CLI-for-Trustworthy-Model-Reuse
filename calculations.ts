@@ -41,10 +41,8 @@ export function BusFactor(rawData: data): number {
 export function Correctness(rawData: data): number {
     logger.log('info', 'Calculating Correctness');
     // check inputs for divide by 0
-    if(rawData.totalissues == 0 || rawData.totalIssuesMonth == 0) {
+    if(rawData.totalissues <= 0 || rawData.totalIssuesMonth <= 0) {
         logger.log('debug', 'Total issues or total issues this month 0');
-        return 1;
-    } else if(rawData.totalissues < 0 || rawData.totalIssuesMonth == 0) {
         return 0;
     }
 
