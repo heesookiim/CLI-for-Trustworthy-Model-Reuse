@@ -76,14 +76,12 @@ then
         echo "GITHUB_TOKEN not set"
         exit 1
     else
-        # make sure files are compiled
-        COMPILE=$(tsc main.ts 2>&1 > '/dev/null')
         # run test suite for coverage and number of tests passed 
         TEST1=$(npx jest --collectCoverage --coverageReporters="json-summary" 2>&1 > '/dev/null')
         TEST2=$(npx jest --json >> tests.json 2> '/dev/null')
 
         # generate proper output
-        TSCTEST=$(tsc testParse.ts 2>&1 > '/dev/null');
+        TSCTEST=$(tsc testParse.ts main.ts 2>&1 > '/dev/null');
         if [[ "${TSCTEST}" != '' ]]; then
             echo "Files failed to compile"
             exit 1
