@@ -168,7 +168,7 @@ async function fetchIssues(apiLink: string, MetricDataPartial1: any) {
         issuesOpen += issuesOpen_Array.length;
 
         // Higher Logging Level
-        logger.log('debug', `Completed Issues: ${issuesTotal}`)
+//        logger.log('debug', `Completed Issues: ${issuesTotal}`)
 
         // break condition to exit the while loop
         // exits in the first iteration if the issues in the first page are less than ${per_page}
@@ -227,7 +227,7 @@ async function fetchPulls(apiLink: string, MetricDataPartial2: any) {
         });
 
         // Higher Logging Level
-        logger.log('debug', `Completed Pull Requests (From Last Year): ${totalPulls365}`)
+//        logger.log('debug', `Completed Pull Requests (From Last Year): ${totalPulls365}`)
 
         // break condition to exit the while loop
         // exits in the first iteration if the pull requests in the first page are less than ${per_page}

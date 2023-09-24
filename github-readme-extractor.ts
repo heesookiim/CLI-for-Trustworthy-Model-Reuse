@@ -72,7 +72,7 @@ function deletePath(localRepoPath: string) {
 
 function checkQuickStart(content: string): number {
   // Check for common quick start phrases and an "Installation" section
-  const quickStartKeywords = ['npm install', 'yarn add', 'getting started', 'setup', 'installation'];
+  const quickStartKeywords = ['npm install', 'yarn add', 'getting started', 'setup', 'installation', 'install'];
     for (const keyword of quickStartKeywords) {
         if (content.toLowerCase().includes(keyword)) {
             return 1;
@@ -88,7 +88,7 @@ function checkQuickStart(content: string): number {
 
 function checkExamples(content: string): number {
   // Check for keywords related to examples
-  const examplesKeywords = ['example', 'sample', 'demo', 'use case'];
+  const examplesKeywords = ['example', 'sample', 'demo', 'use case', 'examples'];
     for (const keyword of examplesKeywords) {
         if (content.toLowerCase().includes(keyword)) {
             return 1;
@@ -104,7 +104,7 @@ function checkExamples(content: string): number {
 
 function checkUsage(content: string): number {
   // Check for keywords related to usage
-  const usageKeywords = ['usage', 'how to use', 'how it works', 'getting started'];
+  const usageKeywords = ['usage', 'how to use', 'how it works', 'getting started', 'documentation', 'features', 'test'];
     for (const keyword of usageKeywords) {
         if (content.toLowerCase().includes(keyword)) {
             return 1;
@@ -127,7 +127,7 @@ function checkLicense(content: string): string {
   const licenseFound1 = content.match(licenseDetection1);
   const licenseFound2 = content.match(licenseDetection2);
   const licenseFound3 = content.match(licenseDetection3);
-
+  
   if (licenseFound1) {
     return licenseFound1[0];
   } else if(licenseFound2) {
