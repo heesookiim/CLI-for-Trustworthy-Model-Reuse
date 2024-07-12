@@ -12,5 +12,4 @@ Packages are rated based on the following metrics
 - `Bus Factor`: Assesses the risk in project maintenance if key contributors leave
 - `Responsive Maintenance`: Indicates the level of ongoing maintenance the project receives
 - `License Compatibility`: Checks the project's compatibility with licenses
-- `Version Score`: Represents the proportion of dependencies fixed to specific major and minor versions
 - `Net score`: (0.4 ∙ BusFactor)  + (0.15 ∙ Correctness) + (0.15 ∙ RampUp) + (0.3 ∙ ResponsiveMaintainer)-(1∙(1-License))
